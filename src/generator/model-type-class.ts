@@ -3,6 +3,7 @@ import {
   OptionalKind,
   Project,
   GetAccessorDeclarationStructure,
+  Writers,
 } from "ts-morph";
 import path from "path";
 
@@ -35,7 +36,7 @@ export default function generateObjectTypeClassFromModel(
   generateModelsImports(
     sourceFile,
     model.fields
-      .filter(field => field.kind === "object")
+      .filter(field => field.location === "inputObjectTypes")
       .filter(field => field.type !== model.name)
       .map(field =>
         dmmfDocument.isModelName(field.type)
@@ -46,7 +47,7 @@ export default function generateObjectTypeClassFromModel(
   generateEnumsImports(
     sourceFile,
     model.fields
-      .filter(field => field.kind === "enum")
+      .filter(field => field.location === "enumTypes")
       .map(field => field.type),
   );
 
@@ -57,16 +58,22 @@ export default function generateObjectTypeClassFromModel(
       {
         name: "ObjectType",
         arguments: [
-          `{
-            isAbstract: true,
-            description: ${model.docs ? `"${model.docs}"` : "undefined"},
-          }`,
+          Writers.object({
+            isAbstract: "true",
+            ...(model.docs && { description: `"${model.docs}"` }),
+            ...(dmmfDocument.options.simpleResolvers && {
+              simpleResolvers: "true",
+            }),
+          }),
         ],
       },
     ],
     properties: model.fields.map<OptionalKind<PropertyDeclarationStructure>>(
       field => {
-        const isOptional = !!field.relationName || !field.isRequired;
+        const isOptional =
+          !!field.relationName ||
+          field.isOmitted.output ||
+          (!field.isRequired && field.typeFieldAlias === undefined);
 
         return {
           name: field.name,
@@ -75,19 +82,19 @@ export default function generateObjectTypeClassFromModel(
           hasQuestionToken: isOptional,
           trailingTrivia: "\r\n",
           decorators: [
-            ...(field.relationName || field.typeFieldAlias
+            ...(field.relationName ||
+            field.typeFieldAlias ||
+            field.isOmitted.output
               ? []
               : [
                   {
                     name: "Field",
                     arguments: [
                       `_type => ${field.typeGraphQLType}`,
-                      `{
-                        nullable: ${isOptional},
-                        description: ${
-                          field.docs ? `"${field.docs}"` : "undefined"
-                        },
-                      }`,
+                      Writers.object({
+                        nullable: `${isOptional}`,
+                        ...(field.docs && { description: `"${field.docs}"` }),
+                      }),
                     ],
                   },
                 ]),
@@ -99,7 +106,12 @@ export default function generateObjectTypeClassFromModel(
       },
     ),
     getAccessors: model.fields
-      .filter(field => field.typeFieldAlias && !field.relationName)
+      .filter(
+        field =>
+          field.typeFieldAlias &&
+          !field.relationName &&
+          !field.isOmitted.output,
+      )
       .map<OptionalKind<GetAccessorDeclarationStructure>>(field => {
         return {
           name: field.typeFieldAlias!,
@@ -110,14 +122,18 @@ export default function generateObjectTypeClassFromModel(
               name: "Field",
               arguments: [
                 `_type => ${field.typeGraphQLType}`,
-                `{
-                  nullable: ${!field.isRequired},
-                  description: ${field.docs ? `"${field.docs}"` : "undefined"},
-                }`,
+                Writers.object({
+                  nullable: `${!field.isRequired}`,
+                  ...(field.docs && { description: `"${field.docs}"` }),
+                }),
               ],
             },
           ],
-          statements: [`return this.${field.name};`],
+          statements: [
+            field.isRequired
+              ? `return this.${field.name};`
+              : `return this.${field.name} ?? null;`,
+          ],
           ...(field.docs && {
             docs: [{ description: field.docs }],
           }),

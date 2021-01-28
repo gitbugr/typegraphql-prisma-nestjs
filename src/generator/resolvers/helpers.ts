@@ -1,42 +1,40 @@
-import { OptionalKind, MethodDeclarationStructure } from "ts-morph";
+import { OptionalKind, MethodDeclarationStructure, Writers } from "ts-morph";
 
-import { getFieldTSType, getTypeGraphQLType } from "../helpers";
 import { DmmfDocument } from "../dmmf/dmmf-document";
 import { DMMF } from "../dmmf/types";
 
+// TODO: extract helper to importable file
+const transformFieldsFunctionStatement = /* ts */ ` function transformFields(fields: Record<string, any>): Record<string, any> {
+  return Object.fromEntries(
+    Object.entries(fields)
+      // remove __typename and others
+      .filter(([key, value]) => !key.startsWith("__"))
+      .map<[string, any]>(([key, value]) => {
+        if (Object.keys(value).length === 0) {
+          return [key, true];
+        }
+        return [key, transformFields(value)];
+      }),
+  );
+}`;
+
 export function generateCrudResolverClassMethodDeclaration(
   action: DMMF.Action,
-  typeName: string,
+  mapping: DMMF.ModelMapping,
   dmmfDocument: DmmfDocument,
-  mapping: DMMF.Mapping,
 ): OptionalKind<MethodDeclarationStructure> {
-  // TODO: move to DMMF transform step
-  const returnTSType = getFieldTSType(
-    action.method.outputType,
-    dmmfDocument,
-    false,
-    mapping.model,
-    typeName,
-  );
-
   return {
     name: action.name,
     isAsync: true,
-    returnType: `Promise<${returnTSType}>`,
+    returnType: `Promise<${action.returnTSType}>`,
     decorators: [
       {
         name: `${action.operation}`,
         arguments: [
-          `_returns => ${getTypeGraphQLType(
-            action.method.outputType,
-            dmmfDocument,
-            mapping.model,
-            typeName,
-          )}`,
-          `{
-            nullable: ${!action.method.outputType.isRequired},
-            description: undefined
-          }`,
+          `_returns => ${action.typeGraphQLType}`,
+          Writers.object({
+            nullable: `${!action.method.isRequired}`,
+          }),
         ],
       },
     ],
@@ -47,7 +45,8 @@ export function generateCrudResolverClassMethodDeclaration(
         type: "any",
         decorators: [{ name: "Context", arguments: [] }],
       },
-      ...(action.kind === "aggregate"
+      ...(action.kind === DMMF.ModelAction.aggregate ||
+      action.kind === DMMF.ModelAction.groupBy
         ? [
             {
               name: "info",
@@ -67,29 +66,31 @@ export function generateCrudResolverClassMethodDeclaration(
           ]),
     ],
     statements:
-      action.kind === "aggregate"
+      action.kind === DMMF.ModelAction.aggregate
         ? [
-            `function transformFields(fields: Record<string, any>): Record<string, any> {
-              return Object.fromEntries(
-                Object.entries(fields)
-                  .filter(([key, value]) => !key.startsWith("_"))
-                  .map<[string, any]>(([key, value]) => {
-                    if (Object.keys(value).length === 0) {
-                      return [key, true];
-                    }
-                    return [key, transformFields(value)];
-                  }),
-              );
-            }`,
-            `return ctx.prisma.${mapping.collectionName}.${action.kind}({
+            transformFieldsFunctionStatement,
+            /* ts */ ` return ctx.prisma.${mapping.collectionName}.${action.kind}({
               ...args,
               ...transformFields(graphqlFields(info as any)),
             });`,
           ]
-        : [
-            `return ctx.prisma.${mapping.collectionName}.${action.kind}(${
-              action.argsTypeName ? "args" : ""
+        : action.kind === DMMF.ModelAction.groupBy
+        ? [
+            transformFieldsFunctionStatement,
+            /* ts */ ` const { count, avg, sum, min, max } = transformFields(
+              graphqlFields(info as any)
+            );`,
+            /* ts */ ` return ctx.prisma.${mapping.collectionName}.${action.kind}({
+              ...args,
+              ...Object.fromEntries(
+                Object.entries({ count, avg, sum, min, max }).filter(([_, v]) => v != null)
+              ),
             });`,
+          ]
+        : [
+            /* ts */ ` return ctx.prisma.${mapping.collectionName}.${
+              action.kind
+            }(${action.argsTypeName ? "args" : ""});`,
           ],
   };
 }

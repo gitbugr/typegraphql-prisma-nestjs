@@ -8,8 +8,7 @@ import { User } from \\"../../../models/User\\";
 @TypeGraphQL.Resolver(_of => User)
 export class CreateUserResolver {
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async createUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: CreateUserArgs): Promise<User> {
     return ctx.prisma.user.create(args);
@@ -27,8 +26,7 @@ import { BatchPayload } from \\"../../outputs/BatchPayload\\";
 @TypeGraphQL.Resolver(_of => User)
 export class DeleteManyUserResolver {
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async deleteManyUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteManyUserArgs): Promise<BatchPayload> {
     return ctx.prisma.user.deleteMany(args);
@@ -45,11 +43,27 @@ import { User } from \\"../../../models/User\\";
 @TypeGraphQL.Resolver(_of => User)
 export class DeleteUserResolver {
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async deleteUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteUserArgs): Promise<User | undefined> {
+  async deleteUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteUserArgs): Promise<User | null> {
     return ctx.prisma.user.delete(args);
+  }
+}
+"
+`;
+
+exports[`crud should properly generate actions resolver classes for prisma model: FindFirstUserResolver 1`] = `
+"import * as TypeGraphQL from \\"type-graphql\\";
+import { FindFirstUserArgs } from \\"./args/FindFirstUserArgs\\";
+import { User } from \\"../../../models/User\\";
+
+@TypeGraphQL.Resolver(_of => User)
+export class FindFirstUserResolver {
+  @TypeGraphQL.Query(_returns => User, {
+    nullable: true
+  })
+  async findFirstUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindFirstUserArgs): Promise<User | null> {
+    return ctx.prisma.user.findFirst(args);
   }
 }
 "
@@ -63,8 +77,7 @@ import { User } from \\"../../../models/User\\";
 @TypeGraphQL.Resolver(_of => User)
 export class FindManyUserResolver {
   @TypeGraphQL.Query(_returns => [User], {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async users(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindManyUserArgs): Promise<User[]> {
     return ctx.prisma.user.findMany(args);
@@ -73,36 +86,27 @@ export class FindManyUserResolver {
 "
 `;
 
-exports[`crud should properly generate actions resolver classes for prisma model: FindOneUserResolver 1`] = `
+exports[`crud should properly generate actions resolver classes for prisma model: FindUniqueUserResolver 1`] = `
 "import * as TypeGraphQL from \\"type-graphql\\";
-import { FindOneUserArgs } from \\"./args/FindOneUserArgs\\";
+import { FindUniqueUserArgs } from \\"./args/FindUniqueUserArgs\\";
 import { User } from \\"../../../models/User\\";
 
 @TypeGraphQL.Resolver(_of => User)
-export class FindOneUserResolver {
+export class FindUniqueUserResolver {
   @TypeGraphQL.Query(_returns => User, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async user(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindOneUserArgs): Promise<User | undefined> {
-    return ctx.prisma.user.findOne(args);
+  async user(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindUniqueUserArgs): Promise<User | null> {
+    return ctx.prisma.user.findUnique(args);
   }
 }
 "
 `;
 
 exports[`crud should properly generate actions resolver classes for prisma model: Index 1`] = `
-"export { UserCrudResolver } from \\"./User/UserCrudResolver\\";
-export { FindOneUserResolver } from \\"./User/FindOneUserResolver\\";
-export { FindManyUserResolver } from \\"./User/FindManyUserResolver\\";
-export { CreateUserResolver } from \\"./User/CreateUserResolver\\";
-export { DeleteUserResolver } from \\"./User/DeleteUserResolver\\";
-export { UpdateUserResolver } from \\"./User/UpdateUserResolver\\";
-export { DeleteManyUserResolver } from \\"./User/DeleteManyUserResolver\\";
-export { UpdateManyUserResolver } from \\"./User/UpdateManyUserResolver\\";
-export { UpsertUserResolver } from \\"./User/UpsertUserResolver\\";
-export { AggregateUserResolver } from \\"./User/AggregateUserResolver\\";
-export * from \\"./User/args\\";
+"export * from \\"./resolvers-actions.index\\";
+export * from \\"./resolvers-crud.index\\";
+export * from \\"./args.index\\";
 "
 `;
 
@@ -115,8 +119,7 @@ import { BatchPayload } from \\"../../outputs/BatchPayload\\";
 @TypeGraphQL.Resolver(_of => User)
 export class UpdateManyUserResolver {
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async updateManyUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateManyUserArgs): Promise<BatchPayload> {
     return ctx.prisma.user.updateMany(args);
@@ -133,10 +136,9 @@ import { User } from \\"../../../models/User\\";
 @TypeGraphQL.Resolver(_of => User)
 export class UpdateUserResolver {
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async updateUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateUserArgs): Promise<User | undefined> {
+  async updateUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateUserArgs): Promise<User | null> {
     return ctx.prisma.user.update(args);
   }
 }
@@ -151,13 +153,36 @@ import { User } from \\"../../../models/User\\";
 @TypeGraphQL.Resolver(_of => User)
 export class UpsertUserResolver {
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async upsertUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpsertUserArgs): Promise<User> {
     return ctx.prisma.user.upsert(args);
   }
 }
+"
+`;
+
+exports[`crud should properly generate actions resolver classes for prisma model: actionsIndex 1`] = `
+"export { FindUniqueUserResolver } from \\"./User/FindUniqueUserResolver\\";
+export { FindFirstUserResolver } from \\"./User/FindFirstUserResolver\\";
+export { FindManyUserResolver } from \\"./User/FindManyUserResolver\\";
+export { CreateUserResolver } from \\"./User/CreateUserResolver\\";
+export { DeleteUserResolver } from \\"./User/DeleteUserResolver\\";
+export { UpdateUserResolver } from \\"./User/UpdateUserResolver\\";
+export { DeleteManyUserResolver } from \\"./User/DeleteManyUserResolver\\";
+export { UpdateManyUserResolver } from \\"./User/UpdateManyUserResolver\\";
+export { UpsertUserResolver } from \\"./User/UpsertUserResolver\\";
+export { AggregateUserResolver } from \\"./User/AggregateUserResolver\\";
+"
+`;
+
+exports[`crud should properly generate actions resolver classes for prisma model: argsIndex 1`] = `
+"export * from \\"./User/args\\";
+"
+`;
+
+exports[`crud should properly generate actions resolver classes for prisma model: crudIndex 1`] = `
+"export { UserCrudResolver } from \\"./User/UserCrudResolver\\";
 "
 `;
 
@@ -167,27 +192,33 @@ import GraphQLJSON from \\"graphql-type-json\\";
 import { UserOrderByInput } from \\"../../../inputs/UserOrderByInput\\";
 import { UserWhereInput } from \\"../../../inputs/UserWhereInput\\";
 import { UserWhereUniqueInput } from \\"../../../inputs/UserWhereUniqueInput\\";
-import { UserDistinctFieldEnum } from \\"../../../../enums/UserDistinctFieldEnum\\";
 
 @TypeGraphQL.ArgsType()
 export class AggregateUserArgs {
-  @TypeGraphQL.Field(_type => UserWhereInput, { nullable: true })
+  @TypeGraphQL.Field(_type => UserWhereInput, {
+    nullable: true
+  })
   where?: UserWhereInput | undefined;
 
-  @TypeGraphQL.Field(_type => [UserOrderByInput], { nullable: true })
+  @TypeGraphQL.Field(_type => [UserOrderByInput], {
+    nullable: true
+  })
   orderBy?: UserOrderByInput[] | undefined;
 
-  @TypeGraphQL.Field(_type => UserWhereUniqueInput, { nullable: true })
+  @TypeGraphQL.Field(_type => UserWhereUniqueInput, {
+    nullable: true
+  })
   cursor?: UserWhereUniqueInput | undefined;
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, { nullable: true })
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   take?: number | undefined;
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, { nullable: true })
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   skip?: number | undefined;
-
-  @TypeGraphQL.Field(_type => [UserDistinctFieldEnum], { nullable: true })
-  distinct?: Array<keyof typeof UserDistinctFieldEnum> | undefined;
 }
 "
 `;
@@ -199,7 +230,9 @@ import { UserCreateInput } from \\"../../../inputs/UserCreateInput\\";
 
 @TypeGraphQL.ArgsType()
 export class CreateUserArgs {
-  @TypeGraphQL.Field(_type => UserCreateInput, { nullable: false })
+  @TypeGraphQL.Field(_type => UserCreateInput, {
+    nullable: false
+  })
   data!: UserCreateInput;
 }
 "
@@ -212,7 +245,9 @@ import { UserWhereInput } from \\"../../../inputs/UserWhereInput\\";
 
 @TypeGraphQL.ArgsType()
 export class DeleteManyUserArgs {
-  @TypeGraphQL.Field(_type => UserWhereInput, { nullable: true })
+  @TypeGraphQL.Field(_type => UserWhereInput, {
+    nullable: true
+  })
   where?: UserWhereInput | undefined;
 }
 "
@@ -225,8 +260,53 @@ import { UserWhereUniqueInput } from \\"../../../inputs/UserWhereUniqueInput\\";
 
 @TypeGraphQL.ArgsType()
 export class DeleteUserArgs {
-  @TypeGraphQL.Field(_type => UserWhereUniqueInput, { nullable: false })
+  @TypeGraphQL.Field(_type => UserWhereUniqueInput, {
+    nullable: false
+  })
   where!: UserWhereUniqueInput;
+}
+"
+`;
+
+exports[`crud should properly generate args classes for every method of crud resolver: FindFirstUserArgs 1`] = `
+"import * as TypeGraphQL from \\"type-graphql\\";
+import GraphQLJSON from \\"graphql-type-json\\";
+import { UserOrderByInput } from \\"../../../inputs/UserOrderByInput\\";
+import { UserWhereInput } from \\"../../../inputs/UserWhereInput\\";
+import { UserWhereUniqueInput } from \\"../../../inputs/UserWhereUniqueInput\\";
+import { UserScalarFieldEnum } from \\"../../../../enums/UserScalarFieldEnum\\";
+
+@TypeGraphQL.ArgsType()
+export class FindFirstUserArgs {
+  @TypeGraphQL.Field(_type => UserWhereInput, {
+    nullable: true
+  })
+  where?: UserWhereInput | undefined;
+
+  @TypeGraphQL.Field(_type => [UserOrderByInput], {
+    nullable: true
+  })
+  orderBy?: UserOrderByInput[] | undefined;
+
+  @TypeGraphQL.Field(_type => UserWhereUniqueInput, {
+    nullable: true
+  })
+  cursor?: UserWhereUniqueInput | undefined;
+
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
+  take?: number | undefined;
+
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
+  skip?: number | undefined;
+
+  @TypeGraphQL.Field(_type => [UserScalarFieldEnum], {
+    nullable: true
+  })
+  distinct?: Array<\\"intIdField\\" | \\"uniqueStringField\\" | \\"optionalStringField\\" | \\"dateField\\"> | undefined;
 }
 "
 `;
@@ -237,39 +317,53 @@ import GraphQLJSON from \\"graphql-type-json\\";
 import { UserOrderByInput } from \\"../../../inputs/UserOrderByInput\\";
 import { UserWhereInput } from \\"../../../inputs/UserWhereInput\\";
 import { UserWhereUniqueInput } from \\"../../../inputs/UserWhereUniqueInput\\";
-import { UserDistinctFieldEnum } from \\"../../../../enums/UserDistinctFieldEnum\\";
+import { UserScalarFieldEnum } from \\"../../../../enums/UserScalarFieldEnum\\";
 
 @TypeGraphQL.ArgsType()
 export class FindManyUserArgs {
-  @TypeGraphQL.Field(_type => UserWhereInput, { nullable: true })
+  @TypeGraphQL.Field(_type => UserWhereInput, {
+    nullable: true
+  })
   where?: UserWhereInput | undefined;
 
-  @TypeGraphQL.Field(_type => [UserOrderByInput], { nullable: true })
+  @TypeGraphQL.Field(_type => [UserOrderByInput], {
+    nullable: true
+  })
   orderBy?: UserOrderByInput[] | undefined;
 
-  @TypeGraphQL.Field(_type => UserWhereUniqueInput, { nullable: true })
+  @TypeGraphQL.Field(_type => UserWhereUniqueInput, {
+    nullable: true
+  })
   cursor?: UserWhereUniqueInput | undefined;
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, { nullable: true })
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   take?: number | undefined;
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, { nullable: true })
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   skip?: number | undefined;
 
-  @TypeGraphQL.Field(_type => [UserDistinctFieldEnum], { nullable: true })
-  distinct?: Array<keyof typeof UserDistinctFieldEnum> | undefined;
+  @TypeGraphQL.Field(_type => [UserScalarFieldEnum], {
+    nullable: true
+  })
+  distinct?: Array<\\"intIdField\\" | \\"uniqueStringField\\" | \\"optionalStringField\\" | \\"dateField\\"> | undefined;
 }
 "
 `;
 
-exports[`crud should properly generate args classes for every method of crud resolver: FindOneUserArgs 1`] = `
+exports[`crud should properly generate args classes for every method of crud resolver: FindUniqueUserArgs 1`] = `
 "import * as TypeGraphQL from \\"type-graphql\\";
 import GraphQLJSON from \\"graphql-type-json\\";
 import { UserWhereUniqueInput } from \\"../../../inputs/UserWhereUniqueInput\\";
 
 @TypeGraphQL.ArgsType()
-export class FindOneUserArgs {
-  @TypeGraphQL.Field(_type => UserWhereUniqueInput, { nullable: false })
+export class FindUniqueUserArgs {
+  @TypeGraphQL.Field(_type => UserWhereUniqueInput, {
+    nullable: false
+  })
   where!: UserWhereUniqueInput;
 }
 "
@@ -280,8 +374,9 @@ exports[`crud should properly generate args classes for every method of crud res
 export { CreateUserArgs } from \\"./CreateUserArgs\\";
 export { DeleteManyUserArgs } from \\"./DeleteManyUserArgs\\";
 export { DeleteUserArgs } from \\"./DeleteUserArgs\\";
+export { FindFirstUserArgs } from \\"./FindFirstUserArgs\\";
 export { FindManyUserArgs } from \\"./FindManyUserArgs\\";
-export { FindOneUserArgs } from \\"./FindOneUserArgs\\";
+export { FindUniqueUserArgs } from \\"./FindUniqueUserArgs\\";
 export { UpdateManyUserArgs } from \\"./UpdateManyUserArgs\\";
 export { UpdateUserArgs } from \\"./UpdateUserArgs\\";
 export { UpsertUserArgs } from \\"./UpsertUserArgs\\";
@@ -296,10 +391,14 @@ import { UserWhereInput } from \\"../../../inputs/UserWhereInput\\";
 
 @TypeGraphQL.ArgsType()
 export class UpdateManyUserArgs {
-  @TypeGraphQL.Field(_type => UserUpdateManyMutationInput, { nullable: false })
+  @TypeGraphQL.Field(_type => UserUpdateManyMutationInput, {
+    nullable: false
+  })
   data!: UserUpdateManyMutationInput;
 
-  @TypeGraphQL.Field(_type => UserWhereInput, { nullable: true })
+  @TypeGraphQL.Field(_type => UserWhereInput, {
+    nullable: true
+  })
   where?: UserWhereInput | undefined;
 }
 "
@@ -313,10 +412,14 @@ import { UserWhereUniqueInput } from \\"../../../inputs/UserWhereUniqueInput\\";
 
 @TypeGraphQL.ArgsType()
 export class UpdateUserArgs {
-  @TypeGraphQL.Field(_type => UserUpdateInput, { nullable: false })
+  @TypeGraphQL.Field(_type => UserUpdateInput, {
+    nullable: false
+  })
   data!: UserUpdateInput;
 
-  @TypeGraphQL.Field(_type => UserWhereUniqueInput, { nullable: false })
+  @TypeGraphQL.Field(_type => UserWhereUniqueInput, {
+    nullable: false
+  })
   where!: UserWhereUniqueInput;
 }
 "
@@ -331,15 +434,28 @@ import { UserWhereUniqueInput } from \\"../../../inputs/UserWhereUniqueInput\\";
 
 @TypeGraphQL.ArgsType()
 export class UpsertUserArgs {
-  @TypeGraphQL.Field(_type => UserWhereUniqueInput, { nullable: false })
+  @TypeGraphQL.Field(_type => UserWhereUniqueInput, {
+    nullable: false
+  })
   where!: UserWhereUniqueInput;
 
-  @TypeGraphQL.Field(_type => UserCreateInput, { nullable: false })
+  @TypeGraphQL.Field(_type => UserCreateInput, {
+    nullable: false
+  })
   create!: UserCreateInput;
 
-  @TypeGraphQL.Field(_type => UserUpdateInput, { nullable: false })
+  @TypeGraphQL.Field(_type => UserUpdateInput, {
+    nullable: false
+  })
   update!: UserUpdateInput;
 }
+"
+`;
+
+exports[`crud should properly generate resolver class for single prisma model: Index 1`] = `
+"export * from \\"./resolvers-actions.index\\";
+export * from \\"./resolvers-crud.index\\";
+export * from \\"./args.index\\";
 "
 `;
 
@@ -351,8 +467,9 @@ import { AggregateUserArgs } from \\"./args/AggregateUserArgs\\";
 import { CreateUserArgs } from \\"./args/CreateUserArgs\\";
 import { DeleteManyUserArgs } from \\"./args/DeleteManyUserArgs\\";
 import { DeleteUserArgs } from \\"./args/DeleteUserArgs\\";
+import { FindFirstUserArgs } from \\"./args/FindFirstUserArgs\\";
 import { FindManyUserArgs } from \\"./args/FindManyUserArgs\\";
-import { FindOneUserArgs } from \\"./args/FindOneUserArgs\\";
+import { FindUniqueUserArgs } from \\"./args/FindUniqueUserArgs\\";
 import { UpdateManyUserArgs } from \\"./args/UpdateManyUserArgs\\";
 import { UpdateUserArgs } from \\"./args/UpdateUserArgs\\";
 import { UpsertUserArgs } from \\"./args/UpsertUserArgs\\";
@@ -363,78 +480,77 @@ import { BatchPayload } from \\"../../outputs/BatchPayload\\";
 @TypeGraphQL.Resolver(_of => User)
 export class UserCrudResolver {
   @TypeGraphQL.Query(_returns => User, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async user(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindOneUserArgs): Promise<User | undefined> {
-    return ctx.prisma.user.findOne(args);
+  async user(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindUniqueUserArgs): Promise<User | null> {
+    return ctx.prisma.user.findUnique(args);
+  }
+
+  @TypeGraphQL.Query(_returns => User, {
+    nullable: true
+  })
+  async findFirstUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindFirstUserArgs): Promise<User | null> {
+    return ctx.prisma.user.findFirst(args);
   }
 
   @TypeGraphQL.Query(_returns => [User], {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async users(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindManyUserArgs): Promise<User[]> {
     return ctx.prisma.user.findMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async createUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: CreateUserArgs): Promise<User> {
     return ctx.prisma.user.create(args);
   }
 
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async deleteUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteUserArgs): Promise<User | undefined> {
+  async deleteUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteUserArgs): Promise<User | null> {
     return ctx.prisma.user.delete(args);
   }
 
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async updateUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateUserArgs): Promise<User | undefined> {
+  async updateUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateUserArgs): Promise<User | null> {
     return ctx.prisma.user.update(args);
   }
 
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async deleteManyUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteManyUserArgs): Promise<BatchPayload> {
     return ctx.prisma.user.deleteMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async updateManyUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateManyUserArgs): Promise<BatchPayload> {
     return ctx.prisma.user.updateMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async upsertUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpsertUserArgs): Promise<User> {
     return ctx.prisma.user.upsert(args);
   }
 
   @TypeGraphQL.Query(_returns => AggregateUser, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async aggregateUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Info() info: GraphQLResolveInfo, @TypeGraphQL.Args() args: AggregateUserArgs): Promise<AggregateUser> {
     function transformFields(fields: Record<string, any>): Record<string, any> {
       return Object.fromEntries(
         Object.entries(fields)
-          .filter(([key, value]) => !key.startsWith(\\"_\\"))
+          // remove __typename and others
+          .filter(([key, value]) => !key.startsWith(\\"__\\"))
           .map<[string, any]>(([key, value]) => {
             if (Object.keys(value).length === 0) {
               return [key, true];
@@ -453,6 +569,46 @@ export class UserCrudResolver {
 "
 `;
 
+exports[`crud should properly generate resolver class for single prisma model: actionsIndex 1`] = `
+"export { FindUniqueUserResolver } from \\"./User/FindUniqueUserResolver\\";
+export { FindFirstUserResolver } from \\"./User/FindFirstUserResolver\\";
+export { FindManyUserResolver } from \\"./User/FindManyUserResolver\\";
+export { CreateUserResolver } from \\"./User/CreateUserResolver\\";
+export { DeleteUserResolver } from \\"./User/DeleteUserResolver\\";
+export { UpdateUserResolver } from \\"./User/UpdateUserResolver\\";
+export { DeleteManyUserResolver } from \\"./User/DeleteManyUserResolver\\";
+export { UpdateManyUserResolver } from \\"./User/UpdateManyUserResolver\\";
+export { UpsertUserResolver } from \\"./User/UpsertUserResolver\\";
+export { AggregateUserResolver } from \\"./User/AggregateUserResolver\\";
+"
+`;
+
+exports[`crud should properly generate resolver class for single prisma model: argsIndex 1`] = `
+"export * from \\"./User/args\\";
+"
+`;
+
+exports[`crud should properly generate resolver class for single prisma model: crudIndex 1`] = `
+"export { UserCrudResolver } from \\"./User/UserCrudResolver\\";
+"
+`;
+
+exports[`crud should properly generate resolver class for single prisma model: mainIndex 1`] = `
+"import { NonEmptyArray } from \\"type-graphql\\";
+import * as crudResolversImport from \\"./resolvers/crud/resolvers-crud.index\\";
+
+export * from \\"./enums\\";
+export * from \\"./models\\";
+export * from \\"./resolvers/crud\\";
+export * from \\"./resolvers/inputs\\";
+export * from \\"./resolvers/outputs\\";
+export * from \\"./enhance\\";
+
+export const crudResolvers = Object.values(crudResolversImport) as unknown as NonEmptyArray<Function>;
+export const resolvers = [...crudResolvers] as unknown as NonEmptyArray<Function>;
+"
+`;
+
 exports[`crud should properly generate resolver class when cannot pluralize model name: StaffCrudResolver 1`] = `
 "import * as TypeGraphQL from \\"type-graphql\\";
 import graphqlFields from \\"graphql-fields\\";
@@ -461,8 +617,9 @@ import { AggregateStaffArgs } from \\"./args/AggregateStaffArgs\\";
 import { CreateStaffArgs } from \\"./args/CreateStaffArgs\\";
 import { DeleteManyStaffArgs } from \\"./args/DeleteManyStaffArgs\\";
 import { DeleteStaffArgs } from \\"./args/DeleteStaffArgs\\";
+import { FindFirstStaffArgs } from \\"./args/FindFirstStaffArgs\\";
 import { FindManyStaffArgs } from \\"./args/FindManyStaffArgs\\";
-import { FindOneStaffArgs } from \\"./args/FindOneStaffArgs\\";
+import { FindUniqueStaffArgs } from \\"./args/FindUniqueStaffArgs\\";
 import { UpdateManyStaffArgs } from \\"./args/UpdateManyStaffArgs\\";
 import { UpdateStaffArgs } from \\"./args/UpdateStaffArgs\\";
 import { UpsertStaffArgs } from \\"./args/UpsertStaffArgs\\";
@@ -473,78 +630,77 @@ import { BatchPayload } from \\"../../outputs/BatchPayload\\";
 @TypeGraphQL.Resolver(_of => Staff)
 export class StaffCrudResolver {
   @TypeGraphQL.Query(_returns => Staff, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async findOneStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindOneStaffArgs): Promise<Staff | undefined> {
-    return ctx.prisma.staff.findOne(args);
+  async findUniqueStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindUniqueStaffArgs): Promise<Staff | null> {
+    return ctx.prisma.staff.findUnique(args);
+  }
+
+  @TypeGraphQL.Query(_returns => Staff, {
+    nullable: true
+  })
+  async findFirstStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindFirstStaffArgs): Promise<Staff | null> {
+    return ctx.prisma.staff.findFirst(args);
   }
 
   @TypeGraphQL.Query(_returns => [Staff], {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async findManyStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindManyStaffArgs): Promise<Staff[]> {
     return ctx.prisma.staff.findMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => Staff, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async createStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: CreateStaffArgs): Promise<Staff> {
     return ctx.prisma.staff.create(args);
   }
 
   @TypeGraphQL.Mutation(_returns => Staff, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async deleteStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteStaffArgs): Promise<Staff | undefined> {
+  async deleteStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteStaffArgs): Promise<Staff | null> {
     return ctx.prisma.staff.delete(args);
   }
 
   @TypeGraphQL.Mutation(_returns => Staff, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async updateStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateStaffArgs): Promise<Staff | undefined> {
+  async updateStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateStaffArgs): Promise<Staff | null> {
     return ctx.prisma.staff.update(args);
   }
 
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async deleteManyStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteManyStaffArgs): Promise<BatchPayload> {
     return ctx.prisma.staff.deleteMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async updateManyStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateManyStaffArgs): Promise<BatchPayload> {
     return ctx.prisma.staff.updateMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => Staff, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async upsertStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpsertStaffArgs): Promise<Staff> {
     return ctx.prisma.staff.upsert(args);
   }
 
   @TypeGraphQL.Query(_returns => AggregateStaff, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async aggregateStaff(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Info() info: GraphQLResolveInfo, @TypeGraphQL.Args() args: AggregateStaffArgs): Promise<AggregateStaff> {
     function transformFields(fields: Record<string, any>): Record<string, any> {
       return Object.fromEntries(
         Object.entries(fields)
-          .filter(([key, value]) => !key.startsWith(\\"_\\"))
+          // remove __typename and others
+          .filter(([key, value]) => !key.startsWith(\\"__\\"))
           .map<[string, any]>(([key, value]) => {
             if (Object.keys(value).length === 0) {
               return [key, true];
@@ -563,19 +719,18 @@ export class StaffCrudResolver {
 "
 `;
 
-exports[`crud should properly generate resolver class when useOriginalMapping is used: FindOneUserResolver 1`] = `
+exports[`crud should properly generate resolver class when useOriginalMapping is used: FindUniqueUserResolver 1`] = `
 "import * as TypeGraphQL from \\"type-graphql\\";
-import { FindOneUserArgs } from \\"./args/FindOneUserArgs\\";
+import { FindUniqueUserArgs } from \\"./args/FindUniqueUserArgs\\";
 import { User } from \\"../../../models/User\\";
 
 @TypeGraphQL.Resolver(_of => User)
-export class FindOneUserResolver {
+export class FindUniqueUserResolver {
   @TypeGraphQL.Query(_returns => User, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async findOneUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindOneUserArgs): Promise<User | undefined> {
-    return ctx.prisma.user.findOne(args);
+  async findUniqueUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindUniqueUserArgs): Promise<User | null> {
+    return ctx.prisma.user.findUnique(args);
   }
 }
 "
@@ -589,8 +744,9 @@ import { AggregateUserArgs } from \\"./args/AggregateUserArgs\\";
 import { CreateUserArgs } from \\"./args/CreateUserArgs\\";
 import { DeleteManyUserArgs } from \\"./args/DeleteManyUserArgs\\";
 import { DeleteUserArgs } from \\"./args/DeleteUserArgs\\";
+import { FindFirstUserArgs } from \\"./args/FindFirstUserArgs\\";
 import { FindManyUserArgs } from \\"./args/FindManyUserArgs\\";
-import { FindOneUserArgs } from \\"./args/FindOneUserArgs\\";
+import { FindUniqueUserArgs } from \\"./args/FindUniqueUserArgs\\";
 import { UpdateManyUserArgs } from \\"./args/UpdateManyUserArgs\\";
 import { UpdateUserArgs } from \\"./args/UpdateUserArgs\\";
 import { UpsertUserArgs } from \\"./args/UpsertUserArgs\\";
@@ -601,78 +757,77 @@ import { BatchPayload } from \\"../../outputs/BatchPayload\\";
 @TypeGraphQL.Resolver(_of => User)
 export class UserCrudResolver {
   @TypeGraphQL.Query(_returns => User, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async findOneUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindOneUserArgs): Promise<User | undefined> {
-    return ctx.prisma.user.findOne(args);
+  async findUniqueUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindUniqueUserArgs): Promise<User | null> {
+    return ctx.prisma.user.findUnique(args);
+  }
+
+  @TypeGraphQL.Query(_returns => User, {
+    nullable: true
+  })
+  async findFirstUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindFirstUserArgs): Promise<User | null> {
+    return ctx.prisma.user.findFirst(args);
   }
 
   @TypeGraphQL.Query(_returns => [User], {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async findManyUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindManyUserArgs): Promise<User[]> {
     return ctx.prisma.user.findMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async createUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: CreateUserArgs): Promise<User> {
     return ctx.prisma.user.create(args);
   }
 
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async deleteUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteUserArgs): Promise<User | undefined> {
+  async deleteUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteUserArgs): Promise<User | null> {
     return ctx.prisma.user.delete(args);
   }
 
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async updateUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateUserArgs): Promise<User | undefined> {
+  async updateUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateUserArgs): Promise<User | null> {
     return ctx.prisma.user.update(args);
   }
 
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async deleteManyUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteManyUserArgs): Promise<BatchPayload> {
     return ctx.prisma.user.deleteMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async updateManyUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateManyUserArgs): Promise<BatchPayload> {
     return ctx.prisma.user.updateMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => User, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async upsertUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpsertUserArgs): Promise<User> {
     return ctx.prisma.user.upsert(args);
   }
 
   @TypeGraphQL.Query(_returns => AggregateUser, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async aggregateUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Info() info: GraphQLResolveInfo, @TypeGraphQL.Args() args: AggregateUserArgs): Promise<AggregateUser> {
     function transformFields(fields: Record<string, any>): Record<string, any> {
       return Object.fromEntries(
         Object.entries(fields)
-          .filter(([key, value]) => !key.startsWith(\\"_\\"))
+          // remove __typename and others
+          .filter(([key, value]) => !key.startsWith(\\"__\\"))
           .map<[string, any]>(([key, value]) => {
             if (Object.keys(value).length === 0) {
               return [key, true];
@@ -691,6 +846,262 @@ export class UserCrudResolver {
 "
 `;
 
+exports[`crud when experimental feature \`groupBy\` is enabled should properly generate group by args class for prisma model: GroupByUserArgs 1`] = `
+"import * as TypeGraphQL from \\"type-graphql\\";
+import GraphQLJSON from \\"graphql-type-json\\";
+import { UserOrderByInput } from \\"../../../inputs/UserOrderByInput\\";
+import { UserScalarWhereWithAggregatesInput } from \\"../../../inputs/UserScalarWhereWithAggregatesInput\\";
+import { UserWhereInput } from \\"../../../inputs/UserWhereInput\\";
+import { UserScalarFieldEnum } from \\"../../../../enums/UserScalarFieldEnum\\";
+
+@TypeGraphQL.ArgsType()
+export class GroupByUserArgs {
+  @TypeGraphQL.Field(_type => UserWhereInput, {
+    nullable: true
+  })
+  where?: UserWhereInput | undefined;
+
+  @TypeGraphQL.Field(_type => [UserOrderByInput], {
+    nullable: true
+  })
+  orderBy?: UserOrderByInput[] | undefined;
+
+  @TypeGraphQL.Field(_type => [UserScalarFieldEnum], {
+    nullable: false
+  })
+  by!: Array<\\"intIdField\\" | \\"uniqueStringField\\" | \\"optionalStringField\\" | \\"dateField\\">;
+
+  @TypeGraphQL.Field(_type => UserScalarWhereWithAggregatesInput, {
+    nullable: true
+  })
+  having?: UserScalarWhereWithAggregatesInput | undefined;
+
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
+  take?: number | undefined;
+
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
+  skip?: number | undefined;
+}
+"
+`;
+
+exports[`crud when experimental feature \`groupBy\` is enabled should properly generate group by args class for prisma model: Index 1`] = `
+"export { AggregateUserArgs } from \\"./AggregateUserArgs\\";
+export { CreateUserArgs } from \\"./CreateUserArgs\\";
+export { DeleteManyUserArgs } from \\"./DeleteManyUserArgs\\";
+export { DeleteUserArgs } from \\"./DeleteUserArgs\\";
+export { FindFirstUserArgs } from \\"./FindFirstUserArgs\\";
+export { FindManyUserArgs } from \\"./FindManyUserArgs\\";
+export { FindUniqueUserArgs } from \\"./FindUniqueUserArgs\\";
+export { GroupByUserArgs } from \\"./GroupByUserArgs\\";
+export { UpdateManyUserArgs } from \\"./UpdateManyUserArgs\\";
+export { UpdateUserArgs } from \\"./UpdateUserArgs\\";
+export { UpsertUserArgs } from \\"./UpsertUserArgs\\";
+"
+`;
+
+exports[`crud when experimental feature \`groupBy\` is enabled should properly generate group by resolver class and crud method for prisma model: GroupByUserResolver 1`] = `
+"import * as TypeGraphQL from \\"type-graphql\\";
+import graphqlFields from \\"graphql-fields\\";
+import { GraphQLResolveInfo } from \\"graphql\\";
+import { GroupByUserArgs } from \\"./args/GroupByUserArgs\\";
+import { User } from \\"../../../models/User\\";
+import { UserGroupBy } from \\"../../outputs/UserGroupBy\\";
+
+@TypeGraphQL.Resolver(_of => User)
+export class GroupByUserResolver {
+  @TypeGraphQL.Query(_returns => [UserGroupBy], {
+    nullable: false
+  })
+  async groupByUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Info() info: GraphQLResolveInfo, @TypeGraphQL.Args() args: GroupByUserArgs): Promise<UserGroupBy[]> {
+    function transformFields(fields: Record<string, any>): Record<string, any> {
+      return Object.fromEntries(
+        Object.entries(fields)
+          // remove __typename and others
+          .filter(([key, value]) => !key.startsWith(\\"__\\"))
+          .map<[string, any]>(([key, value]) => {
+            if (Object.keys(value).length === 0) {
+              return [key, true];
+            }
+            return [key, transformFields(value)];
+          }),
+      );
+    }
+
+    const { count, avg, sum, min, max } = transformFields(
+      graphqlFields(info as any)
+    );
+    return ctx.prisma.user.groupBy({
+      ...args,
+      ...Object.fromEntries(
+        Object.entries({ count, avg, sum, min, max }).filter(([_, v]) => v != null)
+      ),
+    });
+  }
+}
+"
+`;
+
+exports[`crud when experimental feature \`groupBy\` is enabled should properly generate group by resolver class and crud method for prisma model: UserCrudResolver 1`] = `
+"import * as TypeGraphQL from \\"type-graphql\\";
+import graphqlFields from \\"graphql-fields\\";
+import { GraphQLResolveInfo } from \\"graphql\\";
+import { AggregateUserArgs } from \\"./args/AggregateUserArgs\\";
+import { CreateUserArgs } from \\"./args/CreateUserArgs\\";
+import { DeleteManyUserArgs } from \\"./args/DeleteManyUserArgs\\";
+import { DeleteUserArgs } from \\"./args/DeleteUserArgs\\";
+import { FindFirstUserArgs } from \\"./args/FindFirstUserArgs\\";
+import { FindManyUserArgs } from \\"./args/FindManyUserArgs\\";
+import { FindUniqueUserArgs } from \\"./args/FindUniqueUserArgs\\";
+import { GroupByUserArgs } from \\"./args/GroupByUserArgs\\";
+import { UpdateManyUserArgs } from \\"./args/UpdateManyUserArgs\\";
+import { UpdateUserArgs } from \\"./args/UpdateUserArgs\\";
+import { UpsertUserArgs } from \\"./args/UpsertUserArgs\\";
+import { User } from \\"../../../models/User\\";
+import { AggregateUser } from \\"../../outputs/AggregateUser\\";
+import { BatchPayload } from \\"../../outputs/BatchPayload\\";
+import { UserGroupBy } from \\"../../outputs/UserGroupBy\\";
+
+@TypeGraphQL.Resolver(_of => User)
+export class UserCrudResolver {
+  @TypeGraphQL.Query(_returns => User, {
+    nullable: true
+  })
+  async user(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindUniqueUserArgs): Promise<User | null> {
+    return ctx.prisma.user.findUnique(args);
+  }
+
+  @TypeGraphQL.Query(_returns => User, {
+    nullable: true
+  })
+  async findFirstUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindFirstUserArgs): Promise<User | null> {
+    return ctx.prisma.user.findFirst(args);
+  }
+
+  @TypeGraphQL.Query(_returns => [User], {
+    nullable: false
+  })
+  async users(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindManyUserArgs): Promise<User[]> {
+    return ctx.prisma.user.findMany(args);
+  }
+
+  @TypeGraphQL.Mutation(_returns => User, {
+    nullable: false
+  })
+  async createUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: CreateUserArgs): Promise<User> {
+    return ctx.prisma.user.create(args);
+  }
+
+  @TypeGraphQL.Mutation(_returns => User, {
+    nullable: true
+  })
+  async deleteUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteUserArgs): Promise<User | null> {
+    return ctx.prisma.user.delete(args);
+  }
+
+  @TypeGraphQL.Mutation(_returns => User, {
+    nullable: true
+  })
+  async updateUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateUserArgs): Promise<User | null> {
+    return ctx.prisma.user.update(args);
+  }
+
+  @TypeGraphQL.Mutation(_returns => BatchPayload, {
+    nullable: false
+  })
+  async deleteManyUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteManyUserArgs): Promise<BatchPayload> {
+    return ctx.prisma.user.deleteMany(args);
+  }
+
+  @TypeGraphQL.Mutation(_returns => BatchPayload, {
+    nullable: false
+  })
+  async updateManyUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateManyUserArgs): Promise<BatchPayload> {
+    return ctx.prisma.user.updateMany(args);
+  }
+
+  @TypeGraphQL.Mutation(_returns => User, {
+    nullable: false
+  })
+  async upsertUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpsertUserArgs): Promise<User> {
+    return ctx.prisma.user.upsert(args);
+  }
+
+  @TypeGraphQL.Query(_returns => AggregateUser, {
+    nullable: false
+  })
+  async aggregateUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Info() info: GraphQLResolveInfo, @TypeGraphQL.Args() args: AggregateUserArgs): Promise<AggregateUser> {
+    function transformFields(fields: Record<string, any>): Record<string, any> {
+      return Object.fromEntries(
+        Object.entries(fields)
+          // remove __typename and others
+          .filter(([key, value]) => !key.startsWith(\\"__\\"))
+          .map<[string, any]>(([key, value]) => {
+            if (Object.keys(value).length === 0) {
+              return [key, true];
+            }
+            return [key, transformFields(value)];
+          }),
+      );
+    }
+
+    return ctx.prisma.user.aggregate({
+      ...args,
+      ...transformFields(graphqlFields(info as any)),
+    });
+  }
+
+  @TypeGraphQL.Query(_returns => [UserGroupBy], {
+    nullable: false
+  })
+  async groupByUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Info() info: GraphQLResolveInfo, @TypeGraphQL.Args() args: GroupByUserArgs): Promise<UserGroupBy[]> {
+    function transformFields(fields: Record<string, any>): Record<string, any> {
+      return Object.fromEntries(
+        Object.entries(fields)
+          // remove __typename and others
+          .filter(([key, value]) => !key.startsWith(\\"__\\"))
+          .map<[string, any]>(([key, value]) => {
+            if (Object.keys(value).length === 0) {
+              return [key, true];
+            }
+            return [key, transformFields(value)];
+          }),
+      );
+    }
+
+    const { count, avg, sum, min, max } = transformFields(
+      graphqlFields(info as any)
+    );
+    return ctx.prisma.user.groupBy({
+      ...args,
+      ...Object.fromEntries(
+        Object.entries({ count, avg, sum, min, max }).filter(([_, v]) => v != null)
+      ),
+    });
+  }
+}
+"
+`;
+
+exports[`crud when experimental feature \`groupBy\` is enabled should properly generate group by resolver class and crud method for prisma model: actionsIndex 1`] = `
+"export { FindUniqueUserResolver } from \\"./User/FindUniqueUserResolver\\";
+export { FindFirstUserResolver } from \\"./User/FindFirstUserResolver\\";
+export { FindManyUserResolver } from \\"./User/FindManyUserResolver\\";
+export { CreateUserResolver } from \\"./User/CreateUserResolver\\";
+export { DeleteUserResolver } from \\"./User/DeleteUserResolver\\";
+export { UpdateUserResolver } from \\"./User/UpdateUserResolver\\";
+export { DeleteManyUserResolver } from \\"./User/DeleteManyUserResolver\\";
+export { UpdateManyUserResolver } from \\"./User/UpdateManyUserResolver\\";
+export { UpsertUserResolver } from \\"./User/UpsertUserResolver\\";
+export { AggregateUserResolver } from \\"./User/AggregateUserResolver\\";
+export { GroupByUserResolver } from \\"./User/GroupByUserResolver\\";
+"
+`;
+
 exports[`crud when model is renamed should properly generate actions resolver classes for prisma model: CreateOneClientResolver 1`] = `
 "import * as TypeGraphQL from \\"type-graphql\\";
 import { CreateClientArgs } from \\"./args/CreateClientArgs\\";
@@ -699,8 +1110,7 @@ import { Client } from \\"../../../models/Client\\";
 @TypeGraphQL.Resolver(_of => Client)
 export class CreateClientResolver {
   @TypeGraphQL.Mutation(_returns => Client, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async createClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: CreateClientArgs): Promise<Client> {
     return ctx.prisma.user.create(args);
@@ -717,10 +1127,9 @@ import { Client } from \\"../../../models/Client\\";
 @TypeGraphQL.Resolver(_of => Client)
 export class DeleteClientResolver {
   @TypeGraphQL.Mutation(_returns => Client, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async deleteClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteClientArgs): Promise<Client | undefined> {
+  async deleteClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteClientArgs): Promise<Client | null> {
     return ctx.prisma.user.delete(args);
   }
 }
@@ -736,11 +1145,27 @@ import { BatchPayload } from \\"../../outputs/BatchPayload\\";
 @TypeGraphQL.Resolver(_of => Client)
 export class DeleteManyClientResolver {
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async deleteManyClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteManyClientArgs): Promise<BatchPayload> {
     return ctx.prisma.user.deleteMany(args);
+  }
+}
+"
+`;
+
+exports[`crud when model is renamed should properly generate actions resolver classes for prisma model: FindFirstClientResolver 1`] = `
+"import * as TypeGraphQL from \\"type-graphql\\";
+import { FindFirstClientArgs } from \\"./args/FindFirstClientArgs\\";
+import { Client } from \\"../../../models/Client\\";
+
+@TypeGraphQL.Resolver(_of => Client)
+export class FindFirstClientResolver {
+  @TypeGraphQL.Query(_returns => Client, {
+    nullable: true
+  })
+  async findFirstClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindFirstClientArgs): Promise<Client | null> {
+    return ctx.prisma.user.findFirst(args);
   }
 }
 "
@@ -754,8 +1179,7 @@ import { Client } from \\"../../../models/Client\\";
 @TypeGraphQL.Resolver(_of => Client)
 export class FindManyClientResolver {
   @TypeGraphQL.Query(_returns => [Client], {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async clients(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindManyClientArgs): Promise<Client[]> {
     return ctx.prisma.user.findMany(args);
@@ -764,36 +1188,20 @@ export class FindManyClientResolver {
 "
 `;
 
-exports[`crud when model is renamed should properly generate actions resolver classes for prisma model: FindOneClientResolver 1`] = `
+exports[`crud when model is renamed should properly generate actions resolver classes for prisma model: FindUniqueClientResolver 1`] = `
 "import * as TypeGraphQL from \\"type-graphql\\";
-import { FindOneClientArgs } from \\"./args/FindOneClientArgs\\";
+import { FindUniqueClientArgs } from \\"./args/FindUniqueClientArgs\\";
 import { Client } from \\"../../../models/Client\\";
 
 @TypeGraphQL.Resolver(_of => Client)
-export class FindOneClientResolver {
+export class FindUniqueClientResolver {
   @TypeGraphQL.Query(_returns => Client, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async client(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindOneClientArgs): Promise<Client | undefined> {
-    return ctx.prisma.user.findOne(args);
+  async client(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindUniqueClientArgs): Promise<Client | null> {
+    return ctx.prisma.user.findUnique(args);
   }
 }
-"
-`;
-
-exports[`crud when model is renamed should properly generate actions resolver classes for prisma model: Index 1`] = `
-"export { ClientCrudResolver } from \\"./Client/ClientCrudResolver\\";
-export { FindOneClientResolver } from \\"./Client/FindOneClientResolver\\";
-export { FindManyClientResolver } from \\"./Client/FindManyClientResolver\\";
-export { CreateClientResolver } from \\"./Client/CreateClientResolver\\";
-export { DeleteClientResolver } from \\"./Client/DeleteClientResolver\\";
-export { UpdateClientResolver } from \\"./Client/UpdateClientResolver\\";
-export { DeleteManyClientResolver } from \\"./Client/DeleteManyClientResolver\\";
-export { UpdateManyClientResolver } from \\"./Client/UpdateManyClientResolver\\";
-export { UpsertClientResolver } from \\"./Client/UpsertClientResolver\\";
-export { AggregateClientResolver } from \\"./Client/AggregateClientResolver\\";
-export * from \\"./Client/args\\";
 "
 `;
 
@@ -805,10 +1213,9 @@ import { Client } from \\"../../../models/Client\\";
 @TypeGraphQL.Resolver(_of => Client)
 export class UpdateClientResolver {
   @TypeGraphQL.Mutation(_returns => Client, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async updateClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateClientArgs): Promise<Client | undefined> {
+  async updateClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateClientArgs): Promise<Client | null> {
     return ctx.prisma.user.update(args);
   }
 }
@@ -824,8 +1231,7 @@ import { BatchPayload } from \\"../../outputs/BatchPayload\\";
 @TypeGraphQL.Resolver(_of => Client)
 export class UpdateManyClientResolver {
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async updateManyClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateManyClientArgs): Promise<BatchPayload> {
     return ctx.prisma.user.updateMany(args);
@@ -842,8 +1248,7 @@ import { Client } from \\"../../../models/Client\\";
 @TypeGraphQL.Resolver(_of => Client)
 export class UpsertClientResolver {
   @TypeGraphQL.Mutation(_returns => Client, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async upsertClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpsertClientArgs): Promise<Client> {
     return ctx.prisma.user.upsert(args);
@@ -858,27 +1263,33 @@ import GraphQLJSON from \\"graphql-type-json\\";
 import { ClientOrderByInput } from \\"../../../inputs/ClientOrderByInput\\";
 import { ClientWhereInput } from \\"../../../inputs/ClientWhereInput\\";
 import { ClientWhereUniqueInput } from \\"../../../inputs/ClientWhereUniqueInput\\";
-import { ClientDistinctFieldEnum } from \\"../../../../enums/ClientDistinctFieldEnum\\";
 
 @TypeGraphQL.ArgsType()
 export class AggregateClientArgs {
-  @TypeGraphQL.Field(_type => ClientWhereInput, { nullable: true })
+  @TypeGraphQL.Field(_type => ClientWhereInput, {
+    nullable: true
+  })
   where?: ClientWhereInput | undefined;
 
-  @TypeGraphQL.Field(_type => [ClientOrderByInput], { nullable: true })
+  @TypeGraphQL.Field(_type => [ClientOrderByInput], {
+    nullable: true
+  })
   orderBy?: ClientOrderByInput[] | undefined;
 
-  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, { nullable: true })
+  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, {
+    nullable: true
+  })
   cursor?: ClientWhereUniqueInput | undefined;
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, { nullable: true })
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   take?: number | undefined;
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, { nullable: true })
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   skip?: number | undefined;
-
-  @TypeGraphQL.Field(_type => [ClientDistinctFieldEnum], { nullable: true })
-  distinct?: Array<keyof typeof ClientDistinctFieldEnum> | undefined;
 }
 "
 `;
@@ -890,7 +1301,9 @@ import { ClientCreateInput } from \\"../../../inputs/ClientCreateInput\\";
 
 @TypeGraphQL.ArgsType()
 export class CreateClientArgs {
-  @TypeGraphQL.Field(_type => ClientCreateInput, { nullable: false })
+  @TypeGraphQL.Field(_type => ClientCreateInput, {
+    nullable: false
+  })
   data!: ClientCreateInput;
 }
 "
@@ -903,7 +1316,9 @@ import { ClientWhereUniqueInput } from \\"../../../inputs/ClientWhereUniqueInput
 
 @TypeGraphQL.ArgsType()
 export class DeleteClientArgs {
-  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, { nullable: false })
+  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, {
+    nullable: false
+  })
   where!: ClientWhereUniqueInput;
 }
 "
@@ -916,8 +1331,53 @@ import { ClientWhereInput } from \\"../../../inputs/ClientWhereInput\\";
 
 @TypeGraphQL.ArgsType()
 export class DeleteManyClientArgs {
-  @TypeGraphQL.Field(_type => ClientWhereInput, { nullable: true })
+  @TypeGraphQL.Field(_type => ClientWhereInput, {
+    nullable: true
+  })
   where?: ClientWhereInput | undefined;
+}
+"
+`;
+
+exports[`crud when model is renamed should properly generate args classes for every method of crud resolver: FindFirstClientArgs 1`] = `
+"import * as TypeGraphQL from \\"type-graphql\\";
+import GraphQLJSON from \\"graphql-type-json\\";
+import { ClientOrderByInput } from \\"../../../inputs/ClientOrderByInput\\";
+import { ClientWhereInput } from \\"../../../inputs/ClientWhereInput\\";
+import { ClientWhereUniqueInput } from \\"../../../inputs/ClientWhereUniqueInput\\";
+import { ClientScalarFieldEnum } from \\"../../../../enums/ClientScalarFieldEnum\\";
+
+@TypeGraphQL.ArgsType()
+export class FindFirstClientArgs {
+  @TypeGraphQL.Field(_type => ClientWhereInput, {
+    nullable: true
+  })
+  where?: ClientWhereInput | undefined;
+
+  @TypeGraphQL.Field(_type => [ClientOrderByInput], {
+    nullable: true
+  })
+  orderBy?: ClientOrderByInput[] | undefined;
+
+  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, {
+    nullable: true
+  })
+  cursor?: ClientWhereUniqueInput | undefined;
+
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
+  take?: number | undefined;
+
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
+  skip?: number | undefined;
+
+  @TypeGraphQL.Field(_type => [ClientScalarFieldEnum], {
+    nullable: true
+  })
+  distinct?: Array<\\"intIdField\\" | \\"uniqueStringField\\" | \\"optionalStringField\\" | \\"dateField\\"> | undefined;
 }
 "
 `;
@@ -928,39 +1388,53 @@ import GraphQLJSON from \\"graphql-type-json\\";
 import { ClientOrderByInput } from \\"../../../inputs/ClientOrderByInput\\";
 import { ClientWhereInput } from \\"../../../inputs/ClientWhereInput\\";
 import { ClientWhereUniqueInput } from \\"../../../inputs/ClientWhereUniqueInput\\";
-import { ClientDistinctFieldEnum } from \\"../../../../enums/ClientDistinctFieldEnum\\";
+import { ClientScalarFieldEnum } from \\"../../../../enums/ClientScalarFieldEnum\\";
 
 @TypeGraphQL.ArgsType()
 export class FindManyClientArgs {
-  @TypeGraphQL.Field(_type => ClientWhereInput, { nullable: true })
+  @TypeGraphQL.Field(_type => ClientWhereInput, {
+    nullable: true
+  })
   where?: ClientWhereInput | undefined;
 
-  @TypeGraphQL.Field(_type => [ClientOrderByInput], { nullable: true })
+  @TypeGraphQL.Field(_type => [ClientOrderByInput], {
+    nullable: true
+  })
   orderBy?: ClientOrderByInput[] | undefined;
 
-  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, { nullable: true })
+  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, {
+    nullable: true
+  })
   cursor?: ClientWhereUniqueInput | undefined;
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, { nullable: true })
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   take?: number | undefined;
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, { nullable: true })
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   skip?: number | undefined;
 
-  @TypeGraphQL.Field(_type => [ClientDistinctFieldEnum], { nullable: true })
-  distinct?: Array<keyof typeof ClientDistinctFieldEnum> | undefined;
+  @TypeGraphQL.Field(_type => [ClientScalarFieldEnum], {
+    nullable: true
+  })
+  distinct?: Array<\\"intIdField\\" | \\"uniqueStringField\\" | \\"optionalStringField\\" | \\"dateField\\"> | undefined;
 }
 "
 `;
 
-exports[`crud when model is renamed should properly generate args classes for every method of crud resolver: FindOneClientArgs 1`] = `
+exports[`crud when model is renamed should properly generate args classes for every method of crud resolver: FindUniqueClientArgs 1`] = `
 "import * as TypeGraphQL from \\"type-graphql\\";
 import GraphQLJSON from \\"graphql-type-json\\";
 import { ClientWhereUniqueInput } from \\"../../../inputs/ClientWhereUniqueInput\\";
 
 @TypeGraphQL.ArgsType()
-export class FindOneClientArgs {
-  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, { nullable: false })
+export class FindUniqueClientArgs {
+  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, {
+    nullable: false
+  })
   where!: ClientWhereUniqueInput;
 }
 "
@@ -971,8 +1445,9 @@ exports[`crud when model is renamed should properly generate args classes for ev
 export { CreateClientArgs } from \\"./CreateClientArgs\\";
 export { DeleteClientArgs } from \\"./DeleteClientArgs\\";
 export { DeleteManyClientArgs } from \\"./DeleteManyClientArgs\\";
+export { FindFirstClientArgs } from \\"./FindFirstClientArgs\\";
 export { FindManyClientArgs } from \\"./FindManyClientArgs\\";
-export { FindOneClientArgs } from \\"./FindOneClientArgs\\";
+export { FindUniqueClientArgs } from \\"./FindUniqueClientArgs\\";
 export { UpdateClientArgs } from \\"./UpdateClientArgs\\";
 export { UpdateManyClientArgs } from \\"./UpdateManyClientArgs\\";
 export { UpsertClientArgs } from \\"./UpsertClientArgs\\";
@@ -987,10 +1462,14 @@ import { ClientWhereUniqueInput } from \\"../../../inputs/ClientWhereUniqueInput
 
 @TypeGraphQL.ArgsType()
 export class UpdateClientArgs {
-  @TypeGraphQL.Field(_type => ClientUpdateInput, { nullable: false })
+  @TypeGraphQL.Field(_type => ClientUpdateInput, {
+    nullable: false
+  })
   data!: ClientUpdateInput;
 
-  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, { nullable: false })
+  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, {
+    nullable: false
+  })
   where!: ClientWhereUniqueInput;
 }
 "
@@ -1004,10 +1483,14 @@ import { ClientWhereInput } from \\"../../../inputs/ClientWhereInput\\";
 
 @TypeGraphQL.ArgsType()
 export class UpdateManyClientArgs {
-  @TypeGraphQL.Field(_type => ClientUpdateManyMutationInput, { nullable: false })
+  @TypeGraphQL.Field(_type => ClientUpdateManyMutationInput, {
+    nullable: false
+  })
   data!: ClientUpdateManyMutationInput;
 
-  @TypeGraphQL.Field(_type => ClientWhereInput, { nullable: true })
+  @TypeGraphQL.Field(_type => ClientWhereInput, {
+    nullable: true
+  })
   where?: ClientWhereInput | undefined;
 }
 "
@@ -1022,13 +1505,19 @@ import { ClientWhereUniqueInput } from \\"../../../inputs/ClientWhereUniqueInput
 
 @TypeGraphQL.ArgsType()
 export class UpsertClientArgs {
-  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, { nullable: false })
+  @TypeGraphQL.Field(_type => ClientWhereUniqueInput, {
+    nullable: false
+  })
   where!: ClientWhereUniqueInput;
 
-  @TypeGraphQL.Field(_type => ClientCreateInput, { nullable: false })
+  @TypeGraphQL.Field(_type => ClientCreateInput, {
+    nullable: false
+  })
   create!: ClientCreateInput;
 
-  @TypeGraphQL.Field(_type => ClientUpdateInput, { nullable: false })
+  @TypeGraphQL.Field(_type => ClientUpdateInput, {
+    nullable: false
+  })
   update!: ClientUpdateInput;
 }
 "
@@ -1042,8 +1531,9 @@ import { AggregateClientArgs } from \\"./args/AggregateClientArgs\\";
 import { CreateClientArgs } from \\"./args/CreateClientArgs\\";
 import { DeleteClientArgs } from \\"./args/DeleteClientArgs\\";
 import { DeleteManyClientArgs } from \\"./args/DeleteManyClientArgs\\";
+import { FindFirstClientArgs } from \\"./args/FindFirstClientArgs\\";
 import { FindManyClientArgs } from \\"./args/FindManyClientArgs\\";
-import { FindOneClientArgs } from \\"./args/FindOneClientArgs\\";
+import { FindUniqueClientArgs } from \\"./args/FindUniqueClientArgs\\";
 import { UpdateClientArgs } from \\"./args/UpdateClientArgs\\";
 import { UpdateManyClientArgs } from \\"./args/UpdateManyClientArgs\\";
 import { UpsertClientArgs } from \\"./args/UpsertClientArgs\\";
@@ -1054,78 +1544,77 @@ import { BatchPayload } from \\"../../outputs/BatchPayload\\";
 @TypeGraphQL.Resolver(_of => Client)
 export class ClientCrudResolver {
   @TypeGraphQL.Query(_returns => Client, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async findOneClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindOneClientArgs): Promise<Client | undefined> {
-    return ctx.prisma.user.findOne(args);
+  async findUniqueClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindUniqueClientArgs): Promise<Client | null> {
+    return ctx.prisma.user.findUnique(args);
+  }
+
+  @TypeGraphQL.Query(_returns => Client, {
+    nullable: true
+  })
+  async findFirstClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindFirstClientArgs): Promise<Client | null> {
+    return ctx.prisma.user.findFirst(args);
   }
 
   @TypeGraphQL.Query(_returns => [Client], {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async findManyClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: FindManyClientArgs): Promise<Client[]> {
     return ctx.prisma.user.findMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => Client, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async createClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: CreateClientArgs): Promise<Client> {
     return ctx.prisma.user.create(args);
   }
 
   @TypeGraphQL.Mutation(_returns => Client, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async deleteClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteClientArgs): Promise<Client | undefined> {
+  async deleteClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteClientArgs): Promise<Client | null> {
     return ctx.prisma.user.delete(args);
   }
 
   @TypeGraphQL.Mutation(_returns => Client, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
-  async updateClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateClientArgs): Promise<Client | undefined> {
+  async updateClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateClientArgs): Promise<Client | null> {
     return ctx.prisma.user.update(args);
   }
 
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async deleteManyClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: DeleteManyClientArgs): Promise<BatchPayload> {
     return ctx.prisma.user.deleteMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => BatchPayload, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async updateManyClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpdateManyClientArgs): Promise<BatchPayload> {
     return ctx.prisma.user.updateMany(args);
   }
 
   @TypeGraphQL.Mutation(_returns => Client, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async upsertClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Args() args: UpsertClientArgs): Promise<Client> {
     return ctx.prisma.user.upsert(args);
   }
 
   @TypeGraphQL.Query(_returns => AggregateClient, {
-    nullable: false,
-    description: undefined
+    nullable: false
   })
   async aggregateClient(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Info() info: GraphQLResolveInfo, @TypeGraphQL.Args() args: AggregateClientArgs): Promise<AggregateClient> {
     function transformFields(fields: Record<string, any>): Record<string, any> {
       return Object.fromEntries(
         Object.entries(fields)
-          .filter(([key, value]) => !key.startsWith(\\"_\\"))
+          // remove __typename and others
+          .filter(([key, value]) => !key.startsWith(\\"__\\"))
           .map<[string, any]>(([key, value]) => {
             if (Object.keys(value).length === 0) {
               return [key, true];
@@ -1140,6 +1629,90 @@ export class ClientCrudResolver {
       ...transformFields(graphqlFields(info as any)),
     });
   }
+}
+"
+`;
+
+exports[`crud when useUncheckedScalarInputs mode is enabled should properly generate create and update args classes: CreateUserArgs 1`] = `
+"import * as TypeGraphQL from \\"type-graphql\\";
+import GraphQLJSON from \\"graphql-type-json\\";
+import { UserUncheckedCreateInput } from \\"../../../inputs/UserUncheckedCreateInput\\";
+
+@TypeGraphQL.ArgsType()
+export class CreateUserArgs {
+  @TypeGraphQL.Field(_type => UserUncheckedCreateInput, {
+    nullable: false
+  })
+  data!: UserUncheckedCreateInput;
+}
+"
+`;
+
+exports[`crud when useUncheckedScalarInputs mode is enabled should properly generate create and update args classes: UpdateManyUserArgs 1`] = `
+"import * as TypeGraphQL from \\"type-graphql\\";
+import GraphQLJSON from \\"graphql-type-json\\";
+import { UserUncheckedUpdateManyInput } from \\"../../../inputs/UserUncheckedUpdateManyInput\\";
+import { UserWhereInput } from \\"../../../inputs/UserWhereInput\\";
+
+@TypeGraphQL.ArgsType()
+export class UpdateManyUserArgs {
+  @TypeGraphQL.Field(_type => UserUncheckedUpdateManyInput, {
+    nullable: false
+  })
+  data!: UserUncheckedUpdateManyInput;
+
+  @TypeGraphQL.Field(_type => UserWhereInput, {
+    nullable: true
+  })
+  where?: UserWhereInput | undefined;
+}
+"
+`;
+
+exports[`crud when useUncheckedScalarInputs mode is enabled should properly generate create and update args classes: UpdateUserArgs 1`] = `
+"import * as TypeGraphQL from \\"type-graphql\\";
+import GraphQLJSON from \\"graphql-type-json\\";
+import { UserUncheckedUpdateInput } from \\"../../../inputs/UserUncheckedUpdateInput\\";
+import { UserWhereUniqueInput } from \\"../../../inputs/UserWhereUniqueInput\\";
+
+@TypeGraphQL.ArgsType()
+export class UpdateUserArgs {
+  @TypeGraphQL.Field(_type => UserUncheckedUpdateInput, {
+    nullable: false
+  })
+  data!: UserUncheckedUpdateInput;
+
+  @TypeGraphQL.Field(_type => UserWhereUniqueInput, {
+    nullable: false
+  })
+  where!: UserWhereUniqueInput;
+}
+"
+`;
+
+exports[`crud when useUncheckedScalarInputs mode is enabled should properly generate create and update args classes: UpsertUserArgs 1`] = `
+"import * as TypeGraphQL from \\"type-graphql\\";
+import GraphQLJSON from \\"graphql-type-json\\";
+import { UserUncheckedCreateInput } from \\"../../../inputs/UserUncheckedCreateInput\\";
+import { UserUncheckedUpdateInput } from \\"../../../inputs/UserUncheckedUpdateInput\\";
+import { UserWhereUniqueInput } from \\"../../../inputs/UserWhereUniqueInput\\";
+
+@TypeGraphQL.ArgsType()
+export class UpsertUserArgs {
+  @TypeGraphQL.Field(_type => UserWhereUniqueInput, {
+    nullable: false
+  })
+  where!: UserWhereUniqueInput;
+
+  @TypeGraphQL.Field(_type => UserUncheckedCreateInput, {
+    nullable: false
+  })
+  create!: UserUncheckedCreateInput;
+
+  @TypeGraphQL.Field(_type => UserUncheckedUpdateInput, {
+    nullable: false
+  })
+  update!: UserUncheckedUpdateInput;
 }
 "
 `;

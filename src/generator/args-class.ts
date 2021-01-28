@@ -1,4 +1,9 @@
-import { PropertyDeclarationStructure, OptionalKind, Project } from "ts-morph";
+import {
+  PropertyDeclarationStructure,
+  OptionalKind,
+  Project,
+  Writers,
+} from "ts-morph";
 import path from "path";
 
 import { argsFolderName } from "./config";
@@ -31,7 +36,7 @@ export default function generateArgsTypeClassFromArgs(
     sourceFile,
     fields
       .map(arg => arg.selectedInputType)
-      .filter(argInputType => argInputType.kind === "object")
+      .filter(argInputType => argInputType.location === "inputObjectTypes")
       .map(argInputType => argInputType.type),
     inputImportsLevel,
   );
@@ -39,7 +44,7 @@ export default function generateArgsTypeClassFromArgs(
     sourceFile,
     fields
       .map(field => field.selectedInputType)
-      .filter(argType => argType.kind === "enum")
+      .filter(argType => argType.location === "enumTypes")
       .map(argType => argType.type as string),
     4,
   );
@@ -54,20 +59,20 @@ export default function generateArgsTypeClassFromArgs(
       },
     ],
     properties: fields.map<OptionalKind<PropertyDeclarationStructure>>(arg => {
-      const isOptional = !arg.selectedInputType.isRequired;
-
       return {
         name: arg.typeName,
         type: arg.fieldTSType,
-        hasExclamationToken: !isOptional,
-        hasQuestionToken: isOptional,
+        hasExclamationToken: arg.isRequired,
+        hasQuestionToken: !arg.isRequired,
         trailingTrivia: "\r\n",
         decorators: [
           {
             name: "Field",
             arguments: [
               `_type => ${arg.typeGraphQLType}`,
-              `{ nullable: ${isOptional} }`,
+              Writers.object({
+                nullable: `${!arg.isRequired}`,
+              }),
             ],
           },
         ],

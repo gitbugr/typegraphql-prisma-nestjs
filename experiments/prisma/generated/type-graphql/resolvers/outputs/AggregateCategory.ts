@@ -1,43 +1,38 @@
 import * as TypeGraphQL from "type-graphql";
 import GraphQLJSON from "graphql-type-json";
-import { JsonValue, InputJsonValue } from "../../../client";
-import { CategoryAvgAggregateOutputType } from "../outputs/CategoryAvgAggregateOutputType";
-import { CategoryMaxAggregateOutputType } from "../outputs/CategoryMaxAggregateOutputType";
-import { CategoryMinAggregateOutputType } from "../outputs/CategoryMinAggregateOutputType";
-import { CategorySumAggregateOutputType } from "../outputs/CategorySumAggregateOutputType";
+import { Prisma } from "../../../client";
+import { CategoryAvgAggregate } from "../outputs/CategoryAvgAggregate";
+import { CategoryCountAggregate } from "../outputs/CategoryCountAggregate";
+import { CategoryMaxAggregate } from "../outputs/CategoryMaxAggregate";
+import { CategoryMinAggregate } from "../outputs/CategoryMinAggregate";
+import { CategorySumAggregate } from "../outputs/CategorySumAggregate";
 
 @TypeGraphQL.ObjectType({
-  isAbstract: true,
-  description: undefined,
+  isAbstract: true
 })
 export class AggregateCategory {
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
-    nullable: false,
-    description: undefined
+  @TypeGraphQL.Field(_type => CategoryCountAggregate, {
+    nullable: true
   })
-  count!: number;
+  count!: CategoryCountAggregate | null;
 
-  @TypeGraphQL.Field(_type => CategoryAvgAggregateOutputType, {
-    nullable: true,
-    description: undefined
+  @TypeGraphQL.Field(_type => CategoryAvgAggregate, {
+    nullable: true
   })
-  avg?: CategoryAvgAggregateOutputType | undefined;
+  avg!: CategoryAvgAggregate | null;
 
-  @TypeGraphQL.Field(_type => CategorySumAggregateOutputType, {
-    nullable: true,
-    description: undefined
+  @TypeGraphQL.Field(_type => CategorySumAggregate, {
+    nullable: true
   })
-  sum?: CategorySumAggregateOutputType | undefined;
+  sum!: CategorySumAggregate | null;
 
-  @TypeGraphQL.Field(_type => CategoryMinAggregateOutputType, {
-    nullable: true,
-    description: undefined
+  @TypeGraphQL.Field(_type => CategoryMinAggregate, {
+    nullable: true
   })
-  min?: CategoryMinAggregateOutputType | undefined;
+  min!: CategoryMinAggregate | null;
 
-  @TypeGraphQL.Field(_type => CategoryMaxAggregateOutputType, {
-    nullable: true,
-    description: undefined
+  @TypeGraphQL.Field(_type => CategoryMaxAggregate, {
+    nullable: true
   })
-  max?: CategoryMaxAggregateOutputType | undefined;
+  max!: CategoryMaxAggregate | null;
 }

@@ -1,17 +1,23 @@
 import * as TypeGraphQL from "type-graphql";
 import GraphQLJSON from "graphql-type-json";
-import { CategoryCreateInput } from "../../../inputs/CategoryCreateInput";
-import { CategoryUpdateInput } from "../../../inputs/CategoryUpdateInput";
+import { CategoryUncheckedCreateInput } from "../../../inputs/CategoryUncheckedCreateInput";
+import { CategoryUncheckedUpdateInput } from "../../../inputs/CategoryUncheckedUpdateInput";
 import { CategoryWhereUniqueInput } from "../../../inputs/CategoryWhereUniqueInput";
 
 @TypeGraphQL.ArgsType()
 export class UpsertCategoryArgs {
-  @TypeGraphQL.Field(_type => CategoryWhereUniqueInput, { nullable: false })
+  @TypeGraphQL.Field(_type => CategoryWhereUniqueInput, {
+    nullable: false
+  })
   where!: CategoryWhereUniqueInput;
 
-  @TypeGraphQL.Field(_type => CategoryCreateInput, { nullable: false })
-  create!: CategoryCreateInput;
+  @TypeGraphQL.Field(_type => CategoryUncheckedCreateInput, {
+    nullable: false
+  })
+  create!: CategoryUncheckedCreateInput;
 
-  @TypeGraphQL.Field(_type => CategoryUpdateInput, { nullable: false })
-  update!: CategoryUpdateInput;
+  @TypeGraphQL.Field(_type => CategoryUncheckedUpdateInput, {
+    nullable: false
+  })
+  update!: CategoryUncheckedUpdateInput;
 }

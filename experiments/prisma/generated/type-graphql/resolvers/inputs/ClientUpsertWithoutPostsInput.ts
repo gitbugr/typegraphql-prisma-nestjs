@@ -1,23 +1,20 @@
 import * as TypeGraphQL from "type-graphql";
 import GraphQLJSON from "graphql-type-json";
-import { JsonValue, InputJsonValue } from "../../../client";
-import { ClientCreateWithoutPostsInput } from "../inputs/ClientCreateWithoutPostsInput";
-import { ClientUpdateWithoutPostsDataInput } from "../inputs/ClientUpdateWithoutPostsDataInput";
+import { Prisma } from "../../../client";
+import { ClientUncheckedCreateWithoutPostsInput } from "../inputs/ClientUncheckedCreateWithoutPostsInput";
+import { ClientUncheckedUpdateWithoutPostsInput } from "../inputs/ClientUncheckedUpdateWithoutPostsInput";
 
 @TypeGraphQL.InputType({
-  isAbstract: true,
-  description: undefined,
+  isAbstract: true
 })
 export class ClientUpsertWithoutPostsInput {
-  @TypeGraphQL.Field(_type => ClientUpdateWithoutPostsDataInput, {
-    nullable: false,
-    description: undefined
+  @TypeGraphQL.Field(_type => ClientUncheckedUpdateWithoutPostsInput, {
+    nullable: false
   })
-  update!: ClientUpdateWithoutPostsDataInput;
+  update!: ClientUncheckedUpdateWithoutPostsInput;
 
-  @TypeGraphQL.Field(_type => ClientCreateWithoutPostsInput, {
-    nullable: false,
-    description: undefined
+  @TypeGraphQL.Field(_type => ClientUncheckedCreateWithoutPostsInput, {
+    nullable: false
   })
-  create!: ClientCreateWithoutPostsInput;
+  create!: ClientUncheckedCreateWithoutPostsInput;
 }

@@ -36,7 +36,7 @@ describe("crud resolvers execution", () => {
       });
     });
 
-    it("should properly call PrismaClient on `findOne` action", async () => {
+    it("should properly call PrismaClient on `findUnique` action", async () => {
       const document = /* graphql */ `
         query {
           user(where: { uniqueStringField: "uniqueValue" }) {
@@ -47,7 +47,7 @@ describe("crud resolvers execution", () => {
       `;
       const prismaMock = {
         user: {
-          findOne: jest.fn().mockResolvedValue({
+          findUnique: jest.fn().mockResolvedValue({
             intIdField: 1,
             dateField: new Date("2019-12-31T14:16:02.572Z"),
           }),
@@ -60,8 +60,8 @@ describe("crud resolvers execution", () => {
 
       expect(errors).toBeUndefined();
       expect(data).toMatchSnapshot("user mocked response");
-      expect(prismaMock.user.findOne.mock.calls).toMatchSnapshot(
-        "findOneUser call args",
+      expect(prismaMock.user.findUnique.mock.calls).toMatchSnapshot(
+        "findUniqueUser call args",
       );
     });
 
@@ -353,13 +353,15 @@ describe("crud resolvers execution", () => {
             orderBy: { intField: desc }
             where: { floatField: { lte: 50 } }
           ) {
-            count
+            count {
+              _all
+            }
           }
         }
       `;
       const prismaMock = {
         user: {
-          aggregate: jest.fn().mockResolvedValue({ count: 5 }),
+          aggregate: jest.fn().mockResolvedValue({ count: { _all: 5 } }),
         },
       };
 
@@ -384,7 +386,10 @@ describe("crud resolvers execution", () => {
             where: { floatField: { lte: 50 } }
           ) {
             __typename
-            count
+            count {
+              intField
+              floatField
+            }
             min {
               __typename
               intField
@@ -411,7 +416,10 @@ describe("crud resolvers execution", () => {
       const prismaMock = {
         user: {
           aggregate: jest.fn().mockResolvedValue({
-            count: 2,
+            count: {
+              intField: 1,
+              floatField: 1,
+            },
             min: {
               intField: 0,
               floatField: 0,
@@ -440,6 +448,84 @@ describe("crud resolvers execution", () => {
       expect(data).toMatchSnapshot("aggregateUser mocked response");
       expect(prismaMock.user.aggregate.mock.calls).toMatchSnapshot(
         "user.aggregate call args",
+      );
+    });
+  });
+  describe("when experimental feature `groupBy` is enabled", () => {
+    beforeAll(async () => {
+      outputDirPath = generateArtifactsDirPath("functional-crud");
+      await fs.mkdir(outputDirPath, { recursive: true });
+      const prismaSchema = /* prisma */ `
+        datasource db {
+          provider = "postgresql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          idField     Int  @id @default(autoincrement())
+          intField    Int
+          floatField  Int
+        }
+      `;
+      await generateCodeFromSchema(prismaSchema, {
+        outputDirPath,
+        enabledPreviewFeatures: ["groupBy"],
+      });
+      const { UserCrudResolver } = require(outputDirPath +
+        "/resolvers/crud/User/UserCrudResolver.ts");
+
+      graphQLSchema = await buildSchema({
+        resolvers: [UserCrudResolver],
+        validate: false,
+      });
+    });
+
+    it("should properly call PrismaClient on `groupBy` action with advanced operations", async () => {
+      const document = /* graphql */ `
+        query {
+          groupByUser(
+            by: [intField]
+            where: { floatField: { gte: 0 } }
+          ) {
+            __typename
+            intField
+            count {
+              __typename
+              _all
+            }
+            min {
+              __typename
+              intField
+              floatField
+            }
+          }
+        }
+      `;
+      const prismaMock = {
+        user: {
+          groupBy: jest.fn().mockResolvedValue([
+            {
+              intField: 10,
+              count: {
+                _all: 5,
+              },
+              min: {
+                intField: 0,
+                floatField: 0,
+              },
+            },
+          ]),
+        },
+      };
+
+      const { data, errors } = await graphql(graphQLSchema, document, null, {
+        prisma: prismaMock,
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data).toMatchSnapshot("groupByUser mocked response");
+      expect(prismaMock.user.groupBy.mock.calls).toMatchSnapshot(
+        "user.groupBy call args",
       );
     });
   });

@@ -24,7 +24,7 @@ describe("crud resolvers execution", () => {
       model User {
         id           Int       @id @default(autoincrement())
         dateOfBirth  DateTime
-        /// @TypeGraphQL.field("firstName")
+        /// @TypeGraphQL.field(name: "firstName")
         name         String
       }
     `;
@@ -46,7 +46,7 @@ describe("crud resolvers execution", () => {
     `;
     const prismaMock = {
       user: {
-        findOne: jest.fn().mockResolvedValue({
+        findUnique: jest.fn().mockResolvedValue({
           id: 1,
           dateOfBirth: new Date("2019-12-31T14:16:02.572Z"),
           name: "John",
@@ -72,7 +72,7 @@ describe("crud resolvers execution", () => {
       model User {
         id           Int       @id @default(autoincrement())
         dateOfBirth  DateTime
-        /// @TypeGraphQL.field("firstName")
+        /// @TypeGraphQL.field(name: "firstName")
         name         String
       }
     `;

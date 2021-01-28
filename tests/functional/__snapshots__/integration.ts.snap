@@ -7,19 +7,19 @@ exports[`generator integration should be able to use generate TypeGraphQL classe
 # -----------------------------------------------
 
 type AggregatePost {
-  avg: PostAvgAggregateOutputType
-  count: Int!
-  max: PostMaxAggregateOutputType
-  min: PostMinAggregateOutputType
-  sum: PostSumAggregateOutputType
+  avg: PostAvgAggregate
+  count: PostCountAggregate
+  max: PostMaxAggregate
+  min: PostMinAggregate
+  sum: PostSumAggregate
 }
 
 type AggregateUser {
-  avg: UserAvgAggregateOutputType
-  count: Int!
-  max: UserMaxAggregateOutputType
-  min: UserMinAggregateOutputType
-  sum: UserSumAggregateOutputType
+  avg: UserAvgAggregate
+  count: UserCountAggregate
+  max: UserMaxAggregate
+  min: UserMinAggregate
+  sum: UserSumAggregate
 }
 
 type BatchPayload {
@@ -30,6 +30,10 @@ enum Color {
   BLUE
   GREEN
   RED
+}
+
+input EnumColorFieldUpdateOperationsInput {
+  set: Color
 }
 
 input EnumColorFilter {
@@ -111,6 +115,10 @@ input NestedStringNullableFilter {
   startsWith: String
 }
 
+input NullableStringFieldUpdateOperationsInput {
+  set: String
+}
+
 type Post {
   author: User!
   authorId: Int!
@@ -119,8 +127,16 @@ type Post {
   uuid: String!
 }
 
-type PostAvgAggregateOutputType {
+type PostAvgAggregate {
   authorId: Float!
+}
+
+type PostCountAggregate {
+  _all: Int!
+  authorId: Int!
+  color: Int
+  content: Int
+  uuid: Int
 }
 
 input PostCreateInput {
@@ -132,7 +148,13 @@ input PostCreateInput {
 
 input PostCreateManyWithoutAuthorInput {
   connect: [PostWhereUniqueInput!]
+  connectOrCreate: [PostCreateOrConnectWithoutauthorInput!]
   create: [PostCreateWithoutAuthorInput!]
+}
+
+input PostCreateOrConnectWithoutauthorInput {
+  create: PostCreateWithoutAuthorInput!
+  where: PostWhereUniqueInput!
 }
 
 input PostCreateWithoutAuthorInput {
@@ -141,25 +163,24 @@ input PostCreateWithoutAuthorInput {
   uuid: String
 }
 
-enum PostDistinctFieldEnum {
-  authorId
-  color
-  content
-  uuid
-}
-
 input PostListRelationFilter {
   every: PostWhereInput
   none: PostWhereInput
   some: PostWhereInput
 }
 
-type PostMaxAggregateOutputType {
+type PostMaxAggregate {
   authorId: Int!
+  color: Color
+  content: String
+  uuid: String
 }
 
-type PostMinAggregateOutputType {
+type PostMinAggregate {
   authorId: Int!
+  color: Color
+  content: String
+  uuid: String
 }
 
 input PostOrderByInput {
@@ -167,6 +188,13 @@ input PostOrderByInput {
   color: SortOrder
   content: SortOrder
   uuid: SortOrder
+}
+
+enum PostScalarFieldEnum {
+  authorId
+  color
+  content
+  uuid
 }
 
 input PostScalarWhereInput {
@@ -179,66 +207,61 @@ input PostScalarWhereInput {
   uuid: StringFilter
 }
 
-type PostSumAggregateOutputType {
+type PostSumAggregate {
   authorId: Int!
 }
 
 input PostUpdateInput {
   author: UserUpdateOneRequiredWithoutPostsInput
-  color: Color
-  content: String
-  uuid: String
-}
-
-input PostUpdateManyDataInput {
-  color: Color
-  content: String
-  uuid: String
+  color: EnumColorFieldUpdateOperationsInput
+  content: StringFieldUpdateOperationsInput
+  uuid: StringFieldUpdateOperationsInput
 }
 
 input PostUpdateManyMutationInput {
-  color: Color
-  content: String
-  uuid: String
+  color: EnumColorFieldUpdateOperationsInput
+  content: StringFieldUpdateOperationsInput
+  uuid: StringFieldUpdateOperationsInput
 }
 
 input PostUpdateManyWithoutAuthorInput {
   connect: [PostWhereUniqueInput!]
+  connectOrCreate: [PostCreateOrConnectWithoutauthorInput!]
   create: [PostCreateWithoutAuthorInput!]
   delete: [PostWhereUniqueInput!]
   deleteMany: [PostScalarWhereInput!]
   disconnect: [PostWhereUniqueInput!]
   set: [PostWhereUniqueInput!]
   update: [PostUpdateWithWhereUniqueWithoutAuthorInput!]
-  updateMany: [PostUpdateManyWithWhereNestedInput!]
+  updateMany: [PostUpdateManyWithWhereWithoutAuthorInput!]
   upsert: [PostUpsertWithWhereUniqueWithoutAuthorInput!]
 }
 
-input PostUpdateManyWithWhereNestedInput {
-  data: PostUpdateManyDataInput!
+input PostUpdateManyWithWhereWithoutAuthorInput {
+  data: PostUpdateManyMutationInput!
   where: PostScalarWhereInput!
 }
 
-input PostUpdateWithoutAuthorDataInput {
-  color: Color
-  content: String
-  uuid: String
+input PostUpdateWithoutAuthorInput {
+  color: EnumColorFieldUpdateOperationsInput
+  content: StringFieldUpdateOperationsInput
+  uuid: StringFieldUpdateOperationsInput
 }
 
 input PostUpdateWithWhereUniqueWithoutAuthorInput {
-  data: PostUpdateWithoutAuthorDataInput!
+  data: PostUpdateWithoutAuthorInput!
   where: PostWhereUniqueInput!
 }
 
 input PostUpsertWithWhereUniqueWithoutAuthorInput {
   create: PostCreateWithoutAuthorInput!
-  update: PostUpdateWithoutAuthorDataInput!
+  update: PostUpdateWithoutAuthorInput!
   where: PostWhereUniqueInput!
 }
 
 input PostWhereInput {
   AND: [PostWhereInput!]
-  author: UserWhereInput
+  author: UserRelationFilter
   authorId: IntFilter
   color: EnumColorFilter
   content: StringFilter
@@ -252,17 +275,28 @@ input PostWhereUniqueInput {
 }
 
 type Query {
-  aggregatePost(cursor: PostWhereUniqueInput, distinct: [PostDistinctFieldEnum!], orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): AggregatePost!
-  aggregateUser(cursor: UserWhereUniqueInput, distinct: [UserDistinctFieldEnum!], orderBy: [UserOrderByInput!], skip: Int, take: Int, where: UserWhereInput): AggregateUser!
+  aggregatePost(cursor: PostWhereUniqueInput, orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): AggregatePost!
+  aggregateUser(cursor: UserWhereUniqueInput, orderBy: [UserOrderByInput!], skip: Int, take: Int, where: UserWhereInput): AggregateUser!
+  findFirstPost(cursor: PostWhereUniqueInput, distinct: [PostScalarFieldEnum!], orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): Post
+  findFirstUser(cursor: UserWhereUniqueInput, distinct: [UserScalarFieldEnum!], orderBy: [UserOrderByInput!], skip: Int, take: Int, where: UserWhereInput): User
   post(where: PostWhereUniqueInput!): Post
-  posts(cursor: PostWhereUniqueInput, distinct: [PostDistinctFieldEnum!], orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): [Post!]!
+  posts(cursor: PostWhereUniqueInput, distinct: [PostScalarFieldEnum!], orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): [Post!]!
   user(where: UserWhereUniqueInput!): User
-  users(cursor: UserWhereUniqueInput, distinct: [UserDistinctFieldEnum!], orderBy: [UserOrderByInput!], skip: Int, take: Int, where: UserWhereInput): [User!]!
+  users(cursor: UserWhereUniqueInput, distinct: [UserScalarFieldEnum!], orderBy: [UserOrderByInput!], skip: Int, take: Int, where: UserWhereInput): [User!]!
+}
+
+enum QueryMode {
+  default
+  insensitive
 }
 
 enum SortOrder {
   asc
   desc
+}
+
+input StringFieldUpdateOperationsInput {
+  set: String
 }
 
 input StringFilter {
@@ -274,6 +308,7 @@ input StringFilter {
   in: [String!]
   lt: String
   lte: String
+  mode: QueryMode
   not: NestedStringFilter
   notIn: [String!]
   startsWith: String
@@ -288,6 +323,7 @@ input StringNullableFilter {
   in: [String!]
   lt: String
   lte: String
+  mode: QueryMode
   not: NestedStringNullableFilter
   notIn: [String!]
   startsWith: String
@@ -296,11 +332,17 @@ input StringNullableFilter {
 type User {
   id: Int!
   name: String
-  posts(cursor: PostWhereUniqueInput, distinct: [PostDistinctFieldEnum!], orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): [Post!]
+  posts(cursor: PostWhereUniqueInput, distinct: [PostScalarFieldEnum!], orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): [Post!]
 }
 
-type UserAvgAggregateOutputType {
+type UserAvgAggregate {
   id: Float!
+}
+
+type UserCountAggregate {
+  _all: Int!
+  id: Int!
+  name: Int
 }
 
 input UserCreateInput {
@@ -310,24 +352,27 @@ input UserCreateInput {
 
 input UserCreateOneWithoutPostsInput {
   connect: UserWhereUniqueInput
+  connectOrCreate: UserCreateOrConnectWithoutpostsInput
   create: UserCreateWithoutPostsInput
+}
+
+input UserCreateOrConnectWithoutpostsInput {
+  create: UserCreateWithoutPostsInput!
+  where: UserWhereUniqueInput!
 }
 
 input UserCreateWithoutPostsInput {
   name: String
 }
 
-enum UserDistinctFieldEnum {
-  id
-  name
+type UserMaxAggregate {
+  id: Int!
+  name: String
 }
 
-type UserMaxAggregateOutputType {
+type UserMinAggregate {
   id: Int!
-}
-
-type UserMinAggregateOutputType {
-  id: Int!
+  name: String
 }
 
 input UserOrderByInput {
@@ -335,33 +380,44 @@ input UserOrderByInput {
   name: SortOrder
 }
 
-type UserSumAggregateOutputType {
+input UserRelationFilter {
+  is: UserWhereInput
+  isNot: UserWhereInput
+}
+
+enum UserScalarFieldEnum {
+  id
+  name
+}
+
+type UserSumAggregate {
   id: Int!
 }
 
 input UserUpdateInput {
-  name: String
+  name: NullableStringFieldUpdateOperationsInput
   posts: PostUpdateManyWithoutAuthorInput
 }
 
 input UserUpdateManyMutationInput {
-  name: String
+  name: NullableStringFieldUpdateOperationsInput
 }
 
 input UserUpdateOneRequiredWithoutPostsInput {
   connect: UserWhereUniqueInput
+  connectOrCreate: UserCreateOrConnectWithoutpostsInput
   create: UserCreateWithoutPostsInput
-  update: UserUpdateWithoutPostsDataInput
+  update: UserUpdateWithoutPostsInput
   upsert: UserUpsertWithoutPostsInput
 }
 
-input UserUpdateWithoutPostsDataInput {
-  name: String
+input UserUpdateWithoutPostsInput {
+  name: NullableStringFieldUpdateOperationsInput
 }
 
 input UserUpsertWithoutPostsInput {
   create: UserCreateWithoutPostsInput!
-  update: UserUpdateWithoutPostsDataInput!
+  update: UserUpdateWithoutPostsInput!
 }
 
 input UserWhereInput {
@@ -382,11 +438,13 @@ input UserWhereUniqueInput {
 exports[`generator integration should generates TypeGraphQL classes files to output folder by running \`prisma generate\`: files structure 1`] = `
 "
 [type-graphql]
+  enhance.ts
   [enums]
     Color.ts
-    PostDistinctFieldEnum.ts
+    PostScalarFieldEnum.ts
+    QueryMode.ts
     SortOrder.ts
-    UserDistinctFieldEnum.ts
+    UserScalarFieldEnum.ts
     index.ts
   index.ts
   [models]
@@ -400,8 +458,9 @@ exports[`generator integration should generates TypeGraphQL classes files to out
         CreatePostResolver.ts
         DeleteManyPostResolver.ts
         DeletePostResolver.ts
+        FindFirstPostResolver.ts
         FindManyPostResolver.ts
-        FindOnePostResolver.ts
+        FindUniquePostResolver.ts
         PostCrudResolver.ts
         UpdateManyPostResolver.ts
         UpdatePostResolver.ts
@@ -411,8 +470,9 @@ exports[`generator integration should generates TypeGraphQL classes files to out
           CreatePostArgs.ts
           DeleteManyPostArgs.ts
           DeletePostArgs.ts
+          FindFirstPostArgs.ts
           FindManyPostArgs.ts
-          FindOnePostArgs.ts
+          FindUniquePostArgs.ts
           UpdateManyPostArgs.ts
           UpdatePostArgs.ts
           UpsertPostArgs.ts
@@ -422,8 +482,9 @@ exports[`generator integration should generates TypeGraphQL classes files to out
         CreateUserResolver.ts
         DeleteManyUserResolver.ts
         DeleteUserResolver.ts
+        FindFirstUserResolver.ts
         FindManyUserResolver.ts
-        FindOneUserResolver.ts
+        FindUniqueUserResolver.ts
         UpdateManyUserResolver.ts
         UpdateUserResolver.ts
         UpsertUserResolver.ts
@@ -433,47 +494,56 @@ exports[`generator integration should generates TypeGraphQL classes files to out
           CreateUserArgs.ts
           DeleteManyUserArgs.ts
           DeleteUserArgs.ts
+          FindFirstUserArgs.ts
           FindManyUserArgs.ts
-          FindOneUserArgs.ts
+          FindUniqueUserArgs.ts
           UpdateManyUserArgs.ts
           UpdateUserArgs.ts
           UpsertUserArgs.ts
           index.ts
+      args.index.ts
       index.ts
+      resolvers-actions.index.ts
+      resolvers-crud.index.ts
     [inputs]
+      EnumColorFieldUpdateOperationsInput.ts
       EnumColorFilter.ts
+      IntFieldUpdateOperationsInput.ts
       IntFilter.ts
       NestedEnumColorFilter.ts
       NestedIntFilter.ts
       NestedStringFilter.ts
       NestedStringNullableFilter.ts
+      NullableStringFieldUpdateOperationsInput.ts
       PostCreateInput.ts
       PostCreateManyWithoutAuthorInput.ts
+      PostCreateOrConnectWithoutauthorInput.ts
       PostCreateWithoutAuthorInput.ts
       PostListRelationFilter.ts
       PostOrderByInput.ts
       PostScalarWhereInput.ts
       PostUpdateInput.ts
-      PostUpdateManyDataInput.ts
       PostUpdateManyMutationInput.ts
-      PostUpdateManyWithWhereNestedInput.ts
+      PostUpdateManyWithWhereWithoutAuthorInput.ts
       PostUpdateManyWithoutAuthorInput.ts
       PostUpdateWithWhereUniqueWithoutAuthorInput.ts
-      PostUpdateWithoutAuthorDataInput.ts
+      PostUpdateWithoutAuthorInput.ts
       PostUpsertWithWhereUniqueWithoutAuthorInput.ts
       PostWhereInput.ts
       PostWhereUniqueInput.ts
+      StringFieldUpdateOperationsInput.ts
       StringFilter.ts
       StringNullableFilter.ts
       UserCreateInput.ts
       UserCreateOneWithoutPostsInput.ts
+      UserCreateOrConnectWithoutpostsInput.ts
       UserCreateWithoutPostsInput.ts
       UserOrderByInput.ts
       UserRelationFilter.ts
       UserUpdateInput.ts
       UserUpdateManyMutationInput.ts
       UserUpdateOneRequiredWithoutPostsInput.ts
-      UserUpdateWithoutPostsDataInput.ts
+      UserUpdateWithoutPostsInput.ts
       UserUpsertWithoutPostsInput.ts
       UserWhereInput.ts
       UserWhereUniqueInput.ts
@@ -482,14 +552,16 @@ exports[`generator integration should generates TypeGraphQL classes files to out
       AggregatePost.ts
       AggregateUser.ts
       BatchPayload.ts
-      PostAvgAggregateOutputType.ts
-      PostMaxAggregateOutputType.ts
-      PostMinAggregateOutputType.ts
-      PostSumAggregateOutputType.ts
-      UserAvgAggregateOutputType.ts
-      UserMaxAggregateOutputType.ts
-      UserMinAggregateOutputType.ts
-      UserSumAggregateOutputType.ts
+      PostAvgAggregate.ts
+      PostCountAggregate.ts
+      PostMaxAggregate.ts
+      PostMinAggregate.ts
+      PostSumAggregate.ts
+      UserAvgAggregate.ts
+      UserCountAggregate.ts
+      UserMaxAggregate.ts
+      UserMinAggregate.ts
+      UserSumAggregate.ts
       index.ts
     [relations]
       [Post]
@@ -499,7 +571,9 @@ exports[`generator integration should generates TypeGraphQL classes files to out
         [args]
           UserPostsArgs.ts
           index.ts
+      args.index.ts
       index.ts
+      resolvers.index.ts
 "
 `;
 

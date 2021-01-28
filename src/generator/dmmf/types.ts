@@ -2,7 +2,7 @@ export namespace DMMF {
   export interface Document {
     datamodel: Datamodel;
     schema: Schema;
-    mappings: Mapping[];
+    modelMappings: ModelMapping[];
   }
   export interface Enum {
     name: string;
@@ -11,7 +11,7 @@ export namespace DMMF {
     // documentation?: string;
     // additional props
     typeName: string;
-    docs?: string;
+    docs: string | undefined;
     valuesMap: Array<{ name: string; value: string }>;
   }
   export interface Datamodel {
@@ -27,6 +27,7 @@ export namespace DMMF {
     isEmbedded: boolean;
     dbName: string | null;
     fields: Field[];
+    // fieldMap?: Record<string, Field>;
     uniqueFields: string[][];
     uniqueIndexes: UniqueIndex[];
     // documentation?: string;
@@ -37,15 +38,21 @@ export namespace DMMF {
     docs: string | undefined;
   }
   export type FieldKind = "scalar" | "object" | "enum";
+  export type FieldNamespace = "model" | "prisma";
+  export type FieldLocation =
+    | "scalar"
+    | "inputObjectTypes"
+    | "outputObjectTypes"
+    | "enumTypes";
   export interface Field {
-    kind: FieldKind;
+    // kind: FieldKind;
     name: string;
     isRequired: boolean;
     isList: boolean;
     isUnique: boolean;
     isId: boolean;
     type: string;
-    dbNames: string[] | null;
+    dbNames?: string[] | null;
     isGenerated: boolean;
     hasDefaultValue: boolean;
     default?: FieldDefault | string | boolean | number;
@@ -55,10 +62,12 @@ export namespace DMMF {
     // documentation?: string;
     // [key: string]: any;
     // additional props
+    location: FieldLocation;
     typeFieldAlias?: string;
     typeGraphQLType: string;
     fieldTSType: string;
     docs: string | undefined;
+    isOmitted: { input: boolean; output: boolean };
   }
   export interface FieldDefault {
     name: string;
@@ -83,21 +92,19 @@ export namespace DMMF {
   }
   export type ArgType = string | InputType | Enum;
   export interface SchemaArgInputType {
-    isRequired: boolean;
-    isNullable: boolean;
     isList: boolean;
     // type: ArgType;
-    kind: FieldKind;
+    location: FieldLocation;
+    namespace?: FieldNamespace;
     // additional props
-    argType: ArgType;
     type: string;
   }
   export interface SchemaArg {
     name: string;
-    // inputType: SchemaArgInputType[];
-    isRelationFilter?: boolean;
-    nullEqualsUndefined?: boolean;
     comment?: string;
+    isNullable: boolean;
+    isRequired: boolean;
+    // inputTypes: SchemaArgInputType[];
     // additional props
     selectedInputType: SchemaArgInputType;
     typeName: string;
@@ -107,14 +114,17 @@ export namespace DMMF {
   }
   export interface OutputType {
     name: string;
-    fields: OutputSchemaField[];
+    // fields: SchemaField[];
+    // fieldMap?: Record<string, SchemaField>;
     isEmbedded?: boolean;
     // additional props
-    modelName: string;
+    fields: OutputSchemaField[];
+    modelName: string; // ???
     typeName: string;
   }
   export interface SchemaField {
     name: string;
+    // isNullable?: boolean;
     // outputType: {
     //   type: string | OutputType | Enum;
     //   isList: boolean;
@@ -123,17 +133,24 @@ export namespace DMMF {
     // };
     outputType: TypeInfo;
     args: SchemaArg[];
+    deprecation?: SchemaFieldDeprecation;
     // additional props
     typeGraphQLType: string;
     fieldTSType: string;
+    isRequired: boolean;
+  }
+  export interface SchemaFieldDeprecation {
+    sinceVersion: string;
+    reason: string;
+    plannedRemovalVersion: string;
   }
   // named subtype of SchemaField->outputType
   export interface TypeInfo {
     // type: string | OutputType | Enum;
     type: string;
     isList: boolean;
-    isRequired: boolean;
-    kind: FieldKind;
+    location: FieldLocation;
+    namespace?: FieldNamespace;
   }
   // additional type
   export interface OutputSchemaField extends SchemaField {
@@ -141,18 +158,20 @@ export namespace DMMF {
   }
   export interface InputType {
     name: string;
-    isWhereType?: boolean;
-    isOrderType?: boolean;
-    atLeastOne?: boolean;
-    atMostOne?: boolean;
+    constraints: {
+      maxNumFields: number | null;
+      minNumFields: number | null;
+    };
     fields: SchemaArg[];
+    // fieldMap?: Record<string, SchemaArg>;
     // additional props
     typeName: string;
   }
-  export interface Mapping {
+  export interface ModelMapping {
     model: string;
     plural: string;
-    // findOne?: string | null;
+    // findUnique?: string | null;
+    // findFirst?: string | null;
     // findMany?: string | null;
     // create?: string | null;
     // update?: string | null;
@@ -161,11 +180,14 @@ export namespace DMMF {
     // delete?: string | null;
     // deleteMany?: string | null;
     // aggregate?: string | null;
+    // groupBy?: string | null;
+    // count?: string | null;
 
     // additional props
     actions: Action[];
     collectionName: string;
     resolverName: string;
+    modelTypeName: string;
   }
   // additional type
   export interface Action {
@@ -177,9 +199,12 @@ export namespace DMMF {
     argsTypeName: string | undefined;
     outputTypeName: string;
     actionResolverName: string;
+    returnTSType: string;
+    typeGraphQLType: string;
   }
   export enum ModelAction {
-    findOne = "findOne",
+    findUnique = "findUnique",
+    findFirst = "findFirst",
     findMany = "findMany",
     create = "create",
     update = "update",
@@ -187,7 +212,8 @@ export namespace DMMF {
     upsert = "upsert",
     delete = "delete",
     deleteMany = "deleteMany",
-    // additional props
+    groupBy = "groupBy",
+    // count = "count",
     aggregate = "aggregate",
   }
   // additional type
@@ -202,10 +228,4 @@ export namespace DMMF {
     outputTypeField: OutputSchemaField;
     argsTypeName: string | undefined;
   }
-}
-export interface BaseField {
-  name: string;
-  type: string | DMMF.Enum | DMMF.OutputType | DMMF.SchemaArg;
-  isList: boolean;
-  isRequired: boolean;
 }

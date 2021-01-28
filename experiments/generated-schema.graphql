@@ -3,32 +3,46 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
-type AggregateCategory {
-  avg: CategoryAvgAggregateOutputType
-  count: Int!
-  max: CategoryMaxAggregateOutputType
-  min: CategoryMinAggregateOutputType
-  sum: CategorySumAggregateOutputType
+type AggregateClient {
+  avg: ClientAvgAggregate
+  count: ClientCountAggregate
+  max: ClientMaxAggregate
+  min: ClientMinAggregate
+  sum: ClientSumAggregate
 }
 
-type AggregateClient {
-  avg: ClientAvgAggregateOutputType
-  count: Int!
-  max: ClientMaxAggregateOutputType
-  min: ClientMinAggregateOutputType
-  sum: ClientSumAggregateOutputType
+type AggregateCreator {
+  avg: CreatorAvgAggregate
+  count: CreatorCountAggregate
+  max: CreatorMaxAggregate
+  min: CreatorMinAggregate
+  sum: CreatorSumAggregate
 }
 
 type AggregateDirector {
-  count: Int!
+  count: DirectorCountAggregate
+  max: DirectorMaxAggregate
+  min: DirectorMinAggregate
 }
 
 type AggregateMovie {
-  count: Int!
+  count: MovieCountAggregate
+  max: MovieMaxAggregate
+  min: MovieMinAggregate
 }
 
 type AggregatePatient {
-  count: Int!
+  count: PatientCountAggregate
+  max: PatientMaxAggregate
+  min: PatientMinAggregate
+}
+
+type AggregateProblem {
+  avg: ProblemAvgAggregate
+  count: ProblemCountAggregate
+  max: ProblemMaxAggregate
+  min: ProblemMinAggregate
+  sum: ProblemSumAggregate
 }
 
 type BatchPayload {
@@ -44,34 +58,52 @@ input BoolFilter {
   not: NestedBoolFilter
 }
 
+input BoolWithAggregatesFilter {
+  count: NestedIntFilter
+  equals: Boolean
+  max: NestedBoolFilter
+  min: NestedBoolFilter
+  not: NestedBoolWithAggregatesFilter
+}
+
 type Category {
   name: String!
   number: Int!
   slug: String!
 }
 
-type CategoryAvgAggregateOutputType {
+type CategoryAvgAggregate {
   number: Float!
 }
 
-input CategoryCreateInput {
+type CategoryCountAggregate {
+  _all: Int!
+  name: Int
+  number: Int!
+  slug: Int
+}
+
+type CategoryGroupBy {
+  avg: CategoryAvgAggregate
+  count: CategoryCountAggregate
+  max: CategoryMaxAggregate
+  min: CategoryMinAggregate
   name: String!
   number: Int!
   slug: String!
+  sum: CategorySumAggregate
 }
 
-enum CategoryDistinctFieldEnum {
-  name
-  number
-  slug
-}
-
-type CategoryMaxAggregateOutputType {
+type CategoryMaxAggregate {
+  name: String
   number: Int!
+  slug: String
 }
 
-type CategoryMinAggregateOutputType {
+type CategoryMinAggregate {
+  name: String
   number: Int!
+  slug: String
 }
 
 input CategoryOrderByInput {
@@ -80,20 +112,28 @@ input CategoryOrderByInput {
   slug: SortOrder
 }
 
-type CategorySumAggregateOutputType {
+enum CategoryScalarFieldEnum {
+  name
+  number
+  slug
+}
+
+input CategoryScalarWhereWithAggregatesInput {
+  AND: [CategoryScalarWhereWithAggregatesInput!]
+  name: StringWithAggregatesFilter
+  NOT: [CategoryScalarWhereWithAggregatesInput!]
+  number: IntWithAggregatesFilter
+  OR: [CategoryScalarWhereWithAggregatesInput!]
+  slug: StringWithAggregatesFilter
+}
+
+input CategorySlugNumberCompoundUniqueInput {
   number: Int!
+  slug: String!
 }
 
-input CategoryUpdateInput {
-  name: StringFieldUpdateOperationsInput
-  number: IntFieldUpdateOperationsInput
-  slug: StringFieldUpdateOperationsInput
-}
-
-input CategoryUpdateManyMutationInput {
-  name: StringFieldUpdateOperationsInput
-  number: IntFieldUpdateOperationsInput
-  slug: StringFieldUpdateOperationsInput
+type CategorySumAggregate {
+  number: Int!
 }
 
 input CategoryWhereInput {
@@ -106,7 +146,7 @@ input CategoryWhereInput {
 }
 
 input CategoryWhereUniqueInput {
-  slug_number: SlugNumberCompoundUniqueInput
+  slug_number: CategorySlugNumberCompoundUniqueInput
 }
 
 """User model doc"""
@@ -114,7 +154,7 @@ type Client {
   accountBalance: Float!
   age: Int!
   amount: Float!
-  clientPosts(cursor: PostWhereUniqueInput, distinct: [PostDistinctFieldEnum!], orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): [Post!]
+  clientPosts(cursor: PostWhereUniqueInput, distinct: [PostScalarFieldEnum!], orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): [Post!]
   email: String!
 
   """renamed field doc"""
@@ -126,65 +166,79 @@ type Client {
   role: Role!
 }
 
-type ClientAvgAggregateOutputType {
+type ClientAvgAggregate {
   age: Float!
   amount: Float!
   balance: Float!
   id: Float!
 }
 
-input ClientCreateInput {
-  accountBalance: Float!
+type ClientCountAggregate {
+  _all: Int!
   age: Int!
-  amount: Float!
-  clientPosts: PostCreateManyWithoutAuthorInput
-  email: String!
-  firstName: String
-  role: Role!
+  amount: Int!
+  balance: Int!
+  email: Int
+  id: Int!
+  name: Int
+  role: Int
+}
+
+input ClientCreateOneWithoutEditorPostsInput {
+  connect: ClientWhereUniqueInput
+  connectOrCreate: ClientCreateOrConnectWithouteditorPostsInput
+  create: ClientUncheckedCreateWithoutEditorPostsInput
 }
 
 input ClientCreateOneWithoutPostsInput {
   connect: ClientWhereUniqueInput
-  connectOrCreate: ClientCreateOrConnectWithoutpostInput
-  create: ClientCreateWithoutPostsInput
+  connectOrCreate: ClientCreateOrConnectWithoutpostsInput
+  create: ClientUncheckedCreateWithoutPostsInput
 }
 
-input ClientCreateOrConnectWithoutpostInput {
-  create: ClientCreateWithoutPostsInput!
+input ClientCreateOrConnectWithouteditorPostsInput {
+  create: ClientUncheckedCreateWithoutEditorPostsInput!
   where: ClientWhereUniqueInput!
 }
 
-input ClientCreateWithoutPostsInput {
-  accountBalance: Float!
+input ClientCreateOrConnectWithoutpostsInput {
+  create: ClientUncheckedCreateWithoutPostsInput!
+  where: ClientWhereUniqueInput!
+}
+
+type ClientGroupBy {
   age: Int!
   amount: Float!
+  avg: ClientAvgAggregate
+  balance: Float!
+  count: ClientCountAggregate
   email: String!
-  firstName: String
+  id: Int!
+  max: ClientMaxAggregate
+  min: ClientMinAggregate
+  name: String
   role: Role!
+  sum: ClientSumAggregate
 }
 
-enum ClientDistinctFieldEnum {
-  accountBalance
-  age
-  amount
-  email
-  firstName
-  id
-  role
-}
-
-type ClientMaxAggregateOutputType {
+type ClientMaxAggregate {
   age: Int!
   amount: Float!
   balance: Float!
+  email: String
   id: Int!
+  name: String
+  role: Role
 }
 
-type ClientMinAggregateOutputType {
+type ClientMinAggregate {
   age: Int!
   amount: Float!
   balance: Float!
+  email: String
   id: Int!
+  name: String
+  role: Role
 }
 
 input ClientOrderByInput {
@@ -197,29 +251,94 @@ input ClientOrderByInput {
   role: SortOrder
 }
 
-type ClientSumAggregateOutputType {
+input ClientRelationFilter {
+  is: ClientWhereInput
+  isNot: ClientWhereInput
+}
+
+enum ClientScalarFieldEnum {
+  accountBalance
+  age
+  amount
+  email
+  firstName
+  id
+  role
+}
+
+input ClientScalarWhereWithAggregatesInput {
+  accountBalance: FloatWithAggregatesFilter
+  age: IntWithAggregatesFilter
+  amount: FloatWithAggregatesFilter
+  AND: [ClientScalarWhereWithAggregatesInput!]
+  email: StringWithAggregatesFilter
+  firstName: StringNullableWithAggregatesFilter
+  id: IntWithAggregatesFilter
+  NOT: [ClientScalarWhereWithAggregatesInput!]
+  OR: [ClientScalarWhereWithAggregatesInput!]
+  role: EnumRoleWithAggregatesFilter
+}
+
+type ClientSumAggregate {
   age: Int!
   amount: Float!
   balance: Float!
   id: Int!
 }
 
-input ClientUpdateInput {
+input ClientUncheckedCreateInput {
+  accountBalance: Float!
+  age: Int!
+  amount: Float!
+  clientPosts: PostUncheckedCreateManyWithoutAuthorInput
+  editorPosts: PostUncheckedCreateManyWithoutEditorInput
+  email: String!
+  firstName: String
+  id: Int
+  role: Role!
+}
+
+input ClientUncheckedCreateWithoutEditorPostsInput {
+  accountBalance: Float!
+  age: Int!
+  amount: Float!
+  clientPosts: PostUncheckedCreateManyWithoutAuthorInput
+  email: String!
+  firstName: String
+  id: Int
+  role: Role!
+}
+
+input ClientUncheckedCreateWithoutPostsInput {
+  accountBalance: Float!
+  age: Int!
+  amount: Float!
+  editorPosts: PostUncheckedCreateManyWithoutEditorInput
+  email: String!
+  firstName: String
+  id: Int
+  role: Role!
+}
+
+input ClientUncheckedUpdateInput {
   accountBalance: FloatFieldUpdateOperationsInput
   age: IntFieldUpdateOperationsInput
   amount: FloatFieldUpdateOperationsInput
-  clientPosts: PostUpdateManyWithoutAuthorInput
+  clientPosts: PostUncheckedUpdateManyWithoutAuthorInput
+  editorPosts: PostUncheckedUpdateManyWithoutEditorInput
   email: StringFieldUpdateOperationsInput
   firstName: NullableStringFieldUpdateOperationsInput
+  id: IntFieldUpdateOperationsInput
   role: EnumRoleFieldUpdateOperationsInput
 }
 
-input ClientUpdateManyMutationInput {
+input ClientUncheckedUpdateManyInput {
   accountBalance: FloatFieldUpdateOperationsInput
   age: IntFieldUpdateOperationsInput
   amount: FloatFieldUpdateOperationsInput
   email: StringFieldUpdateOperationsInput
   firstName: NullableStringFieldUpdateOperationsInput
+  id: IntFieldUpdateOperationsInput
   role: EnumRoleFieldUpdateOperationsInput
 }
 
@@ -229,6 +348,7 @@ input ClientWhereInput {
   amount: FloatFilter
   AND: [ClientWhereInput!]
   clientPosts: PostListRelationFilter
+  editorPosts: PostListRelationFilter
   email: StringFilter
   firstName: StringNullableFilter
   id: IntFilter
@@ -239,6 +359,129 @@ input ClientWhereInput {
 
 input ClientWhereUniqueInput {
   email: String
+  id: Int
+}
+
+type Creator {
+  id: Int!
+  likes(cursor: ProblemWhereUniqueInput, distinct: [ProblemScalarFieldEnum!], orderBy: [ProblemOrderByInput!], skip: Int, take: Int, where: ProblemWhereInput): [Problem!]
+  name: String!
+  problems(cursor: ProblemWhereUniqueInput, distinct: [ProblemScalarFieldEnum!], orderBy: [ProblemOrderByInput!], skip: Int, take: Int, where: ProblemWhereInput): [Problem!]
+}
+
+type CreatorAvgAggregate {
+  id: Float!
+}
+
+type CreatorCountAggregate {
+  _all: Int!
+  id: Int!
+  name: Int
+}
+
+input CreatorCreateManyWithoutLikesInput {
+  connect: [CreatorWhereUniqueInput!]
+  connectOrCreate: [CreatorCreateOrConnectWithoutlikesInput!]
+  create: [CreatorCreateWithoutLikesInput!]
+}
+
+input CreatorCreateOrConnectWithoutlikesInput {
+  create: CreatorUncheckedCreateWithoutLikesInput!
+  where: CreatorWhereUniqueInput!
+}
+
+input CreatorCreateWithoutLikesInput {
+  name: String!
+  problems: ProblemCreateManyWithoutCreatorInput
+}
+
+type CreatorGroupBy {
+  avg: CreatorAvgAggregate
+  count: CreatorCountAggregate
+  id: Int!
+  max: CreatorMaxAggregate
+  min: CreatorMinAggregate
+  name: String!
+  sum: CreatorSumAggregate
+}
+
+input CreatorListRelationFilter {
+  every: CreatorWhereInput
+  none: CreatorWhereInput
+  some: CreatorWhereInput
+}
+
+type CreatorMaxAggregate {
+  id: Int!
+  name: String
+}
+
+type CreatorMinAggregate {
+  id: Int!
+  name: String
+}
+
+input CreatorOrderByInput {
+  id: SortOrder
+  name: SortOrder
+}
+
+input CreatorRelationFilter {
+  is: CreatorWhereInput
+  isNot: CreatorWhereInput
+}
+
+enum CreatorScalarFieldEnum {
+  id
+  name
+}
+
+input CreatorScalarWhereWithAggregatesInput {
+  AND: [CreatorScalarWhereWithAggregatesInput!]
+  id: IntWithAggregatesFilter
+  name: StringWithAggregatesFilter
+  NOT: [CreatorScalarWhereWithAggregatesInput!]
+  OR: [CreatorScalarWhereWithAggregatesInput!]
+}
+
+type CreatorSumAggregate {
+  id: Int!
+}
+
+input CreatorUncheckedCreateInput {
+  id: Int
+  name: String!
+  problems: ProblemUncheckedCreateManyWithoutCreatorInput
+}
+
+input CreatorUncheckedCreateWithoutLikesInput {
+  id: Int
+  name: String!
+  problems: ProblemUncheckedCreateManyWithoutCreatorInput
+}
+
+input CreatorUncheckedUpdateInput {
+  id: IntFieldUpdateOperationsInput
+  name: StringFieldUpdateOperationsInput
+  problems: ProblemUncheckedUpdateManyWithoutCreatorInput
+}
+
+input CreatorUncheckedUpdateManyInput {
+  id: IntFieldUpdateOperationsInput
+  name: StringFieldUpdateOperationsInput
+}
+
+input CreatorWhereInput {
+  AND: [CreatorWhereInput!]
+  id: IntFilter
+  likes: ProblemListRelationFilter
+  name: StringFilter
+  NOT: [CreatorWhereInput!]
+  OR: [CreatorWhereInput!]
+  problems: ProblemListRelationFilter
+}
+
+input CreatorWhereUniqueInput {
   id: Int
 }
 
@@ -262,43 +505,53 @@ input DateTimeFilter {
   notIn: [DateTime!]
 }
 
+input DateTimeWithAggregatesFilter {
+  count: NestedIntFilter
+  equals: DateTime
+  gt: DateTime
+  gte: DateTime
+  in: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  max: NestedDateTimeFilter
+  min: NestedDateTimeFilter
+  not: NestedDateTimeWithAggregatesFilter
+  notIn: [DateTime!]
+}
+
 type Director {
   firstName: String!
   lastName: String!
-  movies(cursor: MovieWhereUniqueInput, distinct: [MovieDistinctFieldEnum!], orderBy: [MovieOrderByInput!], skip: Int, take: Int, where: MovieWhereInput): [Movie!]
+  movies(cursor: MovieWhereUniqueInput, distinct: [MovieScalarFieldEnum!], orderBy: [MovieOrderByInput!], skip: Int, take: Int, where: MovieWhereInput): [Movie!]
 }
 
-input DirectorCreateInput {
-  firstName: String!
-  lastName: String!
-  movies: MovieCreateManyWithoutDirectorInput
+type DirectorCountAggregate {
+  _all: Int!
+  firstName: Int
+  lastName: Int
 }
 
-input DirectorCreateOneWithoutMoviesInput {
-  connect: DirectorWhereUniqueInput
-  connectOrCreate: DirectorCreateOrConnectWithoutMovieInput
-  create: DirectorCreateWithoutMoviesInput
-}
-
-input DirectorCreateOrConnectWithoutMovieInput {
-  create: DirectorCreateWithoutMoviesInput!
-  where: DirectorWhereUniqueInput!
-}
-
-input DirectorCreateWithoutMoviesInput {
+input DirectorFirstNameLastNameCompoundUniqueInput {
   firstName: String!
   lastName: String!
 }
 
-enum DirectorDistinctFieldEnum {
-  firstName
-  lastName
+type DirectorGroupBy {
+  count: DirectorCountAggregate
+  firstName: String!
+  lastName: String!
+  max: DirectorMaxAggregate
+  min: DirectorMinAggregate
 }
 
-input DirectorFirstNameDirectorLastNameTitleCompoundUniqueInput {
-  directorFirstName: String!
-  directorLastName: String!
-  title: String!
+type DirectorMaxAggregate {
+  firstName: String
+  lastName: String
+}
+
+type DirectorMinAggregate {
+  firstName: String
+  lastName: String
 }
 
 input DirectorOrderByInput {
@@ -306,33 +559,39 @@ input DirectorOrderByInput {
   lastName: SortOrder
 }
 
-input DirectorUpdateInput {
+input DirectorRelationFilter {
+  is: DirectorWhereInput
+  isNot: DirectorWhereInput
+}
+
+enum DirectorScalarFieldEnum {
+  firstName
+  lastName
+}
+
+input DirectorScalarWhereWithAggregatesInput {
+  AND: [DirectorScalarWhereWithAggregatesInput!]
+  firstName: StringWithAggregatesFilter
+  lastName: StringWithAggregatesFilter
+  NOT: [DirectorScalarWhereWithAggregatesInput!]
+  OR: [DirectorScalarWhereWithAggregatesInput!]
+}
+
+input DirectorUncheckedCreateInput {
+  firstName: String!
+  lastName: String!
+  movies: MovieUncheckedCreateManyWithoutDirectorInput
+}
+
+input DirectorUncheckedUpdateInput {
   firstName: StringFieldUpdateOperationsInput
   lastName: StringFieldUpdateOperationsInput
-  movies: MovieUpdateManyWithoutDirectorInput
+  movies: MovieUncheckedUpdateManyWithoutDirectorInput
 }
 
-input DirectorUpdateManyMutationInput {
+input DirectorUncheckedUpdateManyInput {
   firstName: StringFieldUpdateOperationsInput
   lastName: StringFieldUpdateOperationsInput
-}
-
-input DirectorUpdateOneRequiredWithoutMoviesInput {
-  connect: DirectorWhereUniqueInput
-  connectOrCreate: DirectorCreateOrConnectWithoutMovieInput
-  create: DirectorCreateWithoutMoviesInput
-  update: DirectorUpdateWithoutMoviesDataInput
-  upsert: DirectorUpsertWithoutMoviesInput
-}
-
-input DirectorUpdateWithoutMoviesDataInput {
-  firstName: StringFieldUpdateOperationsInput
-  lastName: StringFieldUpdateOperationsInput
-}
-
-input DirectorUpsertWithoutMoviesInput {
-  create: DirectorCreateWithoutMoviesInput!
-  update: DirectorUpdateWithoutMoviesDataInput!
 }
 
 input DirectorWhereInput {
@@ -345,13 +604,23 @@ input DirectorWhereInput {
 }
 
 input DirectorWhereUniqueInput {
-  firstName_lastName: FirstNameLastNameCompoundUniqueInput
+  firstName_lastName: DirectorFirstNameLastNameCompoundUniqueInput
 }
 
 input EnumPostKindNullableFilter {
   equals: PostKind
   in: [PostKind!]
   not: NestedEnumPostKindNullableFilter
+  notIn: [PostKind!]
+}
+
+input EnumPostKindNullableWithAggregatesFilter {
+  count: NestedIntNullableFilter
+  equals: PostKind
+  in: [PostKind!]
+  max: NestedEnumPostKindNullableFilter
+  min: NestedEnumPostKindNullableFilter
+  not: NestedEnumPostKindNullableWithAggregatesFilter
   notIn: [PostKind!]
 }
 
@@ -366,9 +635,14 @@ input EnumRoleFilter {
   notIn: [Role!]
 }
 
-input FirstNameLastNameCompoundUniqueInput {
-  firstName: String!
-  lastName: String!
+input EnumRoleWithAggregatesFilter {
+  count: NestedIntFilter
+  equals: Role
+  in: [Role!]
+  max: NestedEnumRoleFilter
+  min: NestedEnumRoleFilter
+  not: NestedEnumRoleWithAggregatesFilter
+  notIn: [Role!]
 }
 
 input FloatFieldUpdateOperationsInput {
@@ -390,6 +664,22 @@ input FloatFilter {
   notIn: [Float!]
 }
 
+input FloatWithAggregatesFilter {
+  avg: NestedFloatFilter
+  count: NestedIntFilter
+  equals: Float
+  gt: Float
+  gte: Float
+  in: [Float!]
+  lt: Float
+  lte: Float
+  max: NestedFloatFilter
+  min: NestedFloatFilter
+  not: NestedFloatWithAggregatesFilter
+  notIn: [Float!]
+  sum: NestedFloatFilter
+}
+
 input IntFieldUpdateOperationsInput {
   decrement: Int
   divide: Int
@@ -409,18 +699,65 @@ input IntFilter {
   notIn: [Int!]
 }
 
+input IntNullableFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntNullableFilter
+  notIn: [Int!]
+}
+
+input IntNullableWithAggregatesFilter {
+  avg: NestedFloatNullableFilter
+  count: NestedIntNullableFilter
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  max: NestedIntNullableFilter
+  min: NestedIntNullableFilter
+  not: NestedIntNullableWithAggregatesFilter
+  notIn: [Int!]
+  sum: NestedIntNullableFilter
+}
+
+input IntWithAggregatesFilter {
+  avg: NestedFloatFilter
+  count: NestedIntFilter
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  max: NestedIntFilter
+  min: NestedIntFilter
+  not: NestedIntWithAggregatesFilter
+  notIn: [Int!]
+  sum: NestedIntFilter
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
-input JsonFieldUpdateOperationsInput {
-  set: JSON
-}
-
 input JsonFilter {
   equals: JSON
-  not: NestedJsonFilter
+  not: JSON
+}
+
+input JsonWithAggregatesFilter {
+  count: NestedIntFilter
+  equals: JSON
+  max: NestedJsonFilter
+  min: NestedJsonFilter
+  not: JSON
 }
 
 type Movie {
@@ -430,19 +767,15 @@ type Movie {
   title: String!
 }
 
-input MovieCreateInput {
-  director: DirectorCreateOneWithoutMoviesInput!
-  title: String!
+type MovieCountAggregate {
+  _all: Int!
+  directorFirstName: Int
+  directorLastName: Int
+  title: Int
 }
 
-input MovieCreateManyWithoutDirectorInput {
-  connect: [MovieWhereUniqueInput!]
-  connectOrCreate: [MovieCreateOrConnectWithoutDirectorInput!]
-  create: [MovieCreateWithoutDirectorInput!]
-}
-
-input MovieCreateOrConnectWithoutDirectorInput {
-  create: MovieCreateWithoutDirectorInput!
+input MovieCreateOrConnectWithoutdirectorInput {
+  create: MovieUncheckedCreateWithoutDirectorInput!
   where: MovieWhereUniqueInput!
 }
 
@@ -450,10 +783,19 @@ input MovieCreateWithoutDirectorInput {
   title: String!
 }
 
-enum MovieDistinctFieldEnum {
-  directorFirstName
-  directorLastName
-  title
+input MovieDirectorFirstNameDirectorLastNameTitleCompoundUniqueInput {
+  directorFirstName: String!
+  directorLastName: String!
+  title: String!
+}
+
+type MovieGroupBy {
+  count: MovieCountAggregate
+  directorFirstName: String!
+  directorLastName: String!
+  max: MovieMaxAggregate
+  min: MovieMinAggregate
+  title: String!
 }
 
 input MovieListRelationFilter {
@@ -462,10 +804,28 @@ input MovieListRelationFilter {
   some: MovieWhereInput
 }
 
+type MovieMaxAggregate {
+  directorFirstName: String
+  directorLastName: String
+  title: String
+}
+
+type MovieMinAggregate {
+  directorFirstName: String
+  directorLastName: String
+  title: String
+}
+
 input MovieOrderByInput {
   directorFirstName: SortOrder
   directorLastName: SortOrder
   title: SortOrder
+}
+
+enum MovieScalarFieldEnum {
+  directorFirstName
+  directorLastName
+  title
 }
 
 input MovieScalarWhereInput {
@@ -477,55 +837,83 @@ input MovieScalarWhereInput {
   title: StringFilter
 }
 
-input MovieUpdateInput {
-  director: DirectorUpdateOneRequiredWithoutMoviesInput
-  title: StringFieldUpdateOperationsInput
+input MovieScalarWhereWithAggregatesInput {
+  AND: [MovieScalarWhereWithAggregatesInput!]
+  directorFirstName: StringWithAggregatesFilter
+  directorLastName: StringWithAggregatesFilter
+  NOT: [MovieScalarWhereWithAggregatesInput!]
+  OR: [MovieScalarWhereWithAggregatesInput!]
+  title: StringWithAggregatesFilter
 }
 
-input MovieUpdateManyDataInput {
-  title: StringFieldUpdateOperationsInput
+input MovieUncheckedCreateInput {
+  directorFirstName: String!
+  directorLastName: String!
+  title: String!
 }
 
-input MovieUpdateManyMutationInput {
-  title: StringFieldUpdateOperationsInput
-}
-
-input MovieUpdateManyWithoutDirectorInput {
+input MovieUncheckedCreateManyWithoutDirectorInput {
   connect: [MovieWhereUniqueInput!]
-  connectOrCreate: [MovieCreateOrConnectWithoutDirectorInput!]
+  connectOrCreate: [MovieCreateOrConnectWithoutdirectorInput!]
+  create: [MovieCreateWithoutDirectorInput!]
+}
+
+input MovieUncheckedCreateWithoutDirectorInput {
+  title: String!
+}
+
+input MovieUncheckedUpdateInput {
+  directorFirstName: StringFieldUpdateOperationsInput
+  directorLastName: StringFieldUpdateOperationsInput
+  title: StringFieldUpdateOperationsInput
+}
+
+input MovieUncheckedUpdateManyInput {
+  directorFirstName: StringFieldUpdateOperationsInput
+  directorLastName: StringFieldUpdateOperationsInput
+  title: StringFieldUpdateOperationsInput
+}
+
+input MovieUncheckedUpdateManyWithoutDirectorInput {
+  connect: [MovieWhereUniqueInput!]
+  connectOrCreate: [MovieCreateOrConnectWithoutdirectorInput!]
   create: [MovieCreateWithoutDirectorInput!]
   delete: [MovieWhereUniqueInput!]
   deleteMany: [MovieScalarWhereInput!]
   disconnect: [MovieWhereUniqueInput!]
   set: [MovieWhereUniqueInput!]
   update: [MovieUpdateWithWhereUniqueWithoutDirectorInput!]
-  updateMany: [MovieUpdateManyWithWhereNestedInput!]
+  updateMany: [MovieUpdateManyWithWhereWithoutDirectorInput!]
   upsert: [MovieUpsertWithWhereUniqueWithoutDirectorInput!]
 }
 
-input MovieUpdateManyWithWhereNestedInput {
-  data: MovieUpdateManyDataInput!
-  where: MovieScalarWhereInput!
-}
-
-input MovieUpdateWithoutDirectorDataInput {
+input MovieUncheckedUpdateManyWithoutMoviesInput {
   title: StringFieldUpdateOperationsInput
 }
 
+input MovieUncheckedUpdateWithoutDirectorInput {
+  title: StringFieldUpdateOperationsInput
+}
+
+input MovieUpdateManyWithWhereWithoutDirectorInput {
+  data: MovieUncheckedUpdateManyWithoutMoviesInput!
+  where: MovieScalarWhereInput!
+}
+
 input MovieUpdateWithWhereUniqueWithoutDirectorInput {
-  data: MovieUpdateWithoutDirectorDataInput!
+  data: MovieUncheckedUpdateWithoutDirectorInput!
   where: MovieWhereUniqueInput!
 }
 
 input MovieUpsertWithWhereUniqueWithoutDirectorInput {
-  create: MovieCreateWithoutDirectorInput!
-  update: MovieUpdateWithoutDirectorDataInput!
+  create: MovieUncheckedCreateWithoutDirectorInput!
+  update: MovieUncheckedUpdateWithoutDirectorInput!
   where: MovieWhereUniqueInput!
 }
 
 input MovieWhereInput {
   AND: [MovieWhereInput!]
-  director: DirectorWhereInput
+  director: DirectorRelationFilter
   directorFirstName: StringFilter
   directorLastName: StringFilter
   NOT: [MovieWhereInput!]
@@ -534,47 +922,62 @@ input MovieWhereInput {
 }
 
 input MovieWhereUniqueInput {
-  directorFirstName_directorLastName_title: DirectorFirstNameDirectorLastNameTitleCompoundUniqueInput
+  directorFirstName_directorLastName_title: MovieDirectorFirstNameDirectorLastNameTitleCompoundUniqueInput
 }
 
 type Mutation {
-  createCategory(data: CategoryCreateInput!): Category!
-  createClient(data: ClientCreateInput!): Client!
-  createDirector(data: DirectorCreateInput!): Director!
-  createMovie(data: MovieCreateInput!): Movie!
-  createPatient(data: PatientCreateInput!): Patient!
-  createPost(data: PostCreateInput!): Post!
-  deleteCategory(where: CategoryWhereUniqueInput!): Category
+  createClient(data: ClientUncheckedCreateInput!): Client!
+  createCreator(data: CreatorUncheckedCreateInput!): Creator!
+  createDirector(data: DirectorUncheckedCreateInput!): Director!
+  createMovie(data: MovieUncheckedCreateInput!): Movie!
+  createPatient(data: PatientUncheckedCreateInput!): Patient!
+  createPost(data: PostUncheckedCreateInput!): Post!
+  createProblem(data: ProblemUncheckedCreateInput!): Problem!
+  customCreatePost(data: PostUncheckedCreateInput!): Post!
   deleteClient(where: ClientWhereUniqueInput!): Client
+  deleteCreator(where: CreatorWhereUniqueInput!): Creator
   deleteDirector(where: DirectorWhereUniqueInput!): Director
-  deleteManyCategory(where: CategoryWhereInput): BatchPayload!
   deleteManyClient(where: ClientWhereInput): BatchPayload!
+  deleteManyCreator(where: CreatorWhereInput): BatchPayload!
   deleteManyDirector(where: DirectorWhereInput): BatchPayload!
   deleteManyMovie(where: MovieWhereInput): BatchPayload!
   deleteManyPatient(where: PatientWhereInput): BatchPayload!
+  deleteManyProblem(where: ProblemWhereInput): BatchPayload!
   deleteMovie(where: MovieWhereUniqueInput!): Movie
   deletePatient(where: PatientWhereUniqueInput!): Patient
-  updateCategory(data: CategoryUpdateInput!, where: CategoryWhereUniqueInput!): Category
-  updateClient(data: ClientUpdateInput!, where: ClientWhereUniqueInput!): Client
-  updateDirector(data: DirectorUpdateInput!, where: DirectorWhereUniqueInput!): Director
-  updateManyCategory(data: CategoryUpdateManyMutationInput!, where: CategoryWhereInput): BatchPayload!
-  updateManyClient(data: ClientUpdateManyMutationInput!, where: ClientWhereInput): BatchPayload!
-  updateManyDirector(data: DirectorUpdateManyMutationInput!, where: DirectorWhereInput): BatchPayload!
-  updateManyMovie(data: MovieUpdateManyMutationInput!, where: MovieWhereInput): BatchPayload!
-  updateManyPatient(data: PatientUpdateManyMutationInput!, where: PatientWhereInput): BatchPayload!
-  updateManyPost(data: PostUpdateManyMutationInput!, where: PostWhereInput): BatchPayload!
-  updateMovie(data: MovieUpdateInput!, where: MovieWhereUniqueInput!): Movie
-  updatePatient(data: PatientUpdateInput!, where: PatientWhereUniqueInput!): Patient
-  upsertCategory(create: CategoryCreateInput!, update: CategoryUpdateInput!, where: CategoryWhereUniqueInput!): Category!
-  upsertClient(create: ClientCreateInput!, update: ClientUpdateInput!, where: ClientWhereUniqueInput!): Client!
-  upsertDirector(create: DirectorCreateInput!, update: DirectorUpdateInput!, where: DirectorWhereUniqueInput!): Director!
-  upsertMovie(create: MovieCreateInput!, update: MovieUpdateInput!, where: MovieWhereUniqueInput!): Movie!
-  upsertPatient(create: PatientCreateInput!, update: PatientUpdateInput!, where: PatientWhereUniqueInput!): Patient!
+  deleteProblem(where: ProblemWhereUniqueInput!): Problem
+  updateClient(data: ClientUncheckedUpdateInput!, where: ClientWhereUniqueInput!): Client
+  updateCreator(data: CreatorUncheckedUpdateInput!, where: CreatorWhereUniqueInput!): Creator
+  updateDirector(data: DirectorUncheckedUpdateInput!, where: DirectorWhereUniqueInput!): Director
+  updateManyClient(data: ClientUncheckedUpdateManyInput!, where: ClientWhereInput): BatchPayload!
+  updateManyCreator(data: CreatorUncheckedUpdateManyInput!, where: CreatorWhereInput): BatchPayload!
+  updateManyDirector(data: DirectorUncheckedUpdateManyInput!, where: DirectorWhereInput): BatchPayload!
+  updateManyMovie(data: MovieUncheckedUpdateManyInput!, where: MovieWhereInput): BatchPayload!
+  updateManyPatient(data: PatientUncheckedUpdateManyInput!, where: PatientWhereInput): BatchPayload!
+  updateManyPost(data: PostUncheckedUpdateManyInput!, where: PostWhereInput): BatchPayload!
+  updateManyProblem(data: ProblemUncheckedUpdateManyInput!, where: ProblemWhereInput): BatchPayload!
+  updateMovie(data: MovieUncheckedUpdateInput!, where: MovieWhereUniqueInput!): Movie
+  updatePatient(data: PatientUncheckedUpdateInput!, where: PatientWhereUniqueInput!): Patient
+  updateProblem(data: ProblemUncheckedUpdateInput!, where: ProblemWhereUniqueInput!): Problem
+  upsertClient(create: ClientUncheckedCreateInput!, update: ClientUncheckedUpdateInput!, where: ClientWhereUniqueInput!): Client!
+  upsertCreator(create: CreatorUncheckedCreateInput!, update: CreatorUncheckedUpdateInput!, where: CreatorWhereUniqueInput!): Creator!
+  upsertDirector(create: DirectorUncheckedCreateInput!, update: DirectorUncheckedUpdateInput!, where: DirectorWhereUniqueInput!): Director!
+  upsertMovie(create: MovieUncheckedCreateInput!, update: MovieUncheckedUpdateInput!, where: MovieWhereUniqueInput!): Movie!
+  upsertPatient(create: PatientUncheckedCreateInput!, update: PatientUncheckedUpdateInput!, where: PatientWhereUniqueInput!): Patient!
+  upsertProblem(create: ProblemUncheckedCreateInput!, update: ProblemUncheckedUpdateInput!, where: ProblemWhereUniqueInput!): Problem!
 }
 
 input NestedBoolFilter {
   equals: Boolean
   not: NestedBoolFilter
+}
+
+input NestedBoolWithAggregatesFilter {
+  count: NestedIntFilter
+  equals: Boolean
+  max: NestedBoolFilter
+  min: NestedBoolFilter
+  not: NestedBoolWithAggregatesFilter
 }
 
 input NestedDateTimeFilter {
@@ -588,6 +991,20 @@ input NestedDateTimeFilter {
   notIn: [DateTime!]
 }
 
+input NestedDateTimeWithAggregatesFilter {
+  count: NestedIntFilter
+  equals: DateTime
+  gt: DateTime
+  gte: DateTime
+  in: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  max: NestedDateTimeFilter
+  min: NestedDateTimeFilter
+  not: NestedDateTimeWithAggregatesFilter
+  notIn: [DateTime!]
+}
+
 input NestedEnumPostKindNullableFilter {
   equals: PostKind
   in: [PostKind!]
@@ -595,10 +1012,30 @@ input NestedEnumPostKindNullableFilter {
   notIn: [PostKind!]
 }
 
+input NestedEnumPostKindNullableWithAggregatesFilter {
+  count: NestedIntNullableFilter
+  equals: PostKind
+  in: [PostKind!]
+  max: NestedEnumPostKindNullableFilter
+  min: NestedEnumPostKindNullableFilter
+  not: NestedEnumPostKindNullableWithAggregatesFilter
+  notIn: [PostKind!]
+}
+
 input NestedEnumRoleFilter {
   equals: Role
   in: [Role!]
   not: NestedEnumRoleFilter
+  notIn: [Role!]
+}
+
+input NestedEnumRoleWithAggregatesFilter {
+  count: NestedIntFilter
+  equals: Role
+  in: [Role!]
+  max: NestedEnumRoleFilter
+  min: NestedEnumRoleFilter
+  not: NestedEnumRoleWithAggregatesFilter
   notIn: [Role!]
 }
 
@@ -613,6 +1050,33 @@ input NestedFloatFilter {
   notIn: [Float!]
 }
 
+input NestedFloatNullableFilter {
+  equals: Float
+  gt: Float
+  gte: Float
+  in: [Float!]
+  lt: Float
+  lte: Float
+  not: NestedFloatNullableFilter
+  notIn: [Float!]
+}
+
+input NestedFloatWithAggregatesFilter {
+  avg: NestedFloatFilter
+  count: NestedIntFilter
+  equals: Float
+  gt: Float
+  gte: Float
+  in: [Float!]
+  lt: Float
+  lte: Float
+  max: NestedFloatFilter
+  min: NestedFloatFilter
+  not: NestedFloatWithAggregatesFilter
+  notIn: [Float!]
+  sum: NestedFloatFilter
+}
+
 input NestedIntFilter {
   equals: Int
   gt: Int
@@ -624,9 +1088,52 @@ input NestedIntFilter {
   notIn: [Int!]
 }
 
+input NestedIntNullableFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntNullableFilter
+  notIn: [Int!]
+}
+
+input NestedIntNullableWithAggregatesFilter {
+  avg: NestedFloatNullableFilter
+  count: NestedIntNullableFilter
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  max: NestedIntNullableFilter
+  min: NestedIntNullableFilter
+  not: NestedIntNullableWithAggregatesFilter
+  notIn: [Int!]
+  sum: NestedIntNullableFilter
+}
+
+input NestedIntWithAggregatesFilter {
+  avg: NestedFloatFilter
+  count: NestedIntFilter
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  max: NestedIntFilter
+  min: NestedIntFilter
+  not: NestedIntWithAggregatesFilter
+  notIn: [Int!]
+  sum: NestedIntFilter
+}
+
 input NestedJsonFilter {
   equals: JSON
-  not: NestedJsonFilter
+  not: JSON
 }
 
 input NestedStringFilter {
@@ -657,8 +1164,50 @@ input NestedStringNullableFilter {
   startsWith: String
 }
 
+input NestedStringNullableWithAggregatesFilter {
+  contains: String
+  count: NestedIntNullableFilter
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  max: NestedStringNullableFilter
+  min: NestedStringNullableFilter
+  not: NestedStringNullableWithAggregatesFilter
+  notIn: [String!]
+  startsWith: String
+}
+
+input NestedStringWithAggregatesFilter {
+  contains: String
+  count: NestedIntFilter
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  max: NestedStringFilter
+  min: NestedStringFilter
+  not: NestedStringWithAggregatesFilter
+  notIn: [String!]
+  startsWith: String
+}
+
 input NullableEnumPostKindFieldUpdateOperationsInput {
   set: PostKind
+}
+
+input NullableIntFieldUpdateOperationsInput {
+  decrement: Int
+  divide: Int
+  increment: Int
+  multiply: Int
+  set: Int
 }
 
 input NullableStringFieldUpdateOperationsInput {
@@ -671,16 +1220,37 @@ type Patient {
   lastName: String!
 }
 
-input PatientCreateInput {
-  email: String!
+type PatientCountAggregate {
+  _all: Int!
+  email: Int
+  firstName: Int
+  lastName: Int
+}
+
+input PatientFirstNameLastNameCompoundUniqueInput {
   firstName: String!
   lastName: String!
 }
 
-enum PatientDistinctFieldEnum {
-  email
-  firstName
-  lastName
+type PatientGroupBy {
+  count: PatientCountAggregate
+  email: String!
+  firstName: String!
+  lastName: String!
+  max: PatientMaxAggregate
+  min: PatientMinAggregate
+}
+
+type PatientMaxAggregate {
+  email: String
+  firstName: String
+  lastName: String
+}
+
+type PatientMinAggregate {
+  email: String
+  firstName: String
+  lastName: String
 }
 
 input PatientOrderByInput {
@@ -689,13 +1259,34 @@ input PatientOrderByInput {
   lastName: SortOrder
 }
 
-input PatientUpdateInput {
+enum PatientScalarFieldEnum {
+  email
+  firstName
+  lastName
+}
+
+input PatientScalarWhereWithAggregatesInput {
+  AND: [PatientScalarWhereWithAggregatesInput!]
+  email: StringWithAggregatesFilter
+  firstName: StringWithAggregatesFilter
+  lastName: StringWithAggregatesFilter
+  NOT: [PatientScalarWhereWithAggregatesInput!]
+  OR: [PatientScalarWhereWithAggregatesInput!]
+}
+
+input PatientUncheckedCreateInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+}
+
+input PatientUncheckedUpdateInput {
   email: StringFieldUpdateOperationsInput
   firstName: StringFieldUpdateOperationsInput
   lastName: StringFieldUpdateOperationsInput
 }
 
-input PatientUpdateManyMutationInput {
+input PatientUncheckedUpdateManyInput {
   email: StringFieldUpdateOperationsInput
   firstName: StringFieldUpdateOperationsInput
   lastName: StringFieldUpdateOperationsInput
@@ -711,7 +1302,7 @@ input PatientWhereInput {
 }
 
 input PatientWhereUniqueInput {
-  firstName_lastName: FirstNameLastNameCompoundUniqueInput
+  firstName_lastName: PatientFirstNameLastNameCompoundUniqueInput
 }
 
 type Post {
@@ -727,50 +1318,79 @@ type Post {
   uuid: String!
 }
 
-input PostCreateInput {
-  author: ClientCreateOneWithoutPostsInput!
-  content: String
-  createdAt: DateTime
-  kind: PostKind
-  metadata: JSON!
-  published: Boolean!
-  title: String!
-  updatedAt: DateTime
-  uuid: String
+type PostAvgAggregate {
+  authorId: Float!
+  editorId: Float
 }
 
-input PostCreateManyWithoutAuthorInput {
-  connect: [PostWhereUniqueInput!]
-  connectOrCreate: [PostCreateOrConnectWithoutUserInput!]
-  create: [PostCreateWithoutAuthorInput!]
+type PostCountAggregate {
+  _all: Int!
+  authorId: Int!
+  content: Int
+  createdAt: Int
+  editorId: Int
+  kind: Int
+  metadata: Int
+  published: Int
+  subtitle: Int
+  title: Int
+  updatedAt: Int
+  uuid: Int
 }
 
-input PostCreateOrConnectWithoutUserInput {
-  create: PostCreateWithoutAuthorInput!
+input PostCreateOrConnectWithoutauthorInput {
+  create: PostUncheckedCreateWithoutAuthorInput!
+  where: PostWhereUniqueInput!
+}
+
+input PostCreateOrConnectWithouteditorInput {
+  create: PostUncheckedCreateWithoutEditorInput!
   where: PostWhereUniqueInput!
 }
 
 input PostCreateWithoutAuthorInput {
   content: String
   createdAt: DateTime
+  editor: ClientCreateOneWithoutEditorPostsInput
   kind: PostKind
   metadata: JSON!
   published: Boolean!
+  subtitle: String!
   title: String!
   updatedAt: DateTime
   uuid: String
 }
 
-enum PostDistinctFieldEnum {
-  authorId
-  content
-  createdAt
-  kind
-  metadata
-  published
-  title
-  updatedAt
-  uuid
+input PostCreateWithoutEditorInput {
+  author: ClientCreateOneWithoutPostsInput!
+  content: String
+  createdAt: DateTime
+  kind: PostKind
+  metadata: JSON!
+  published: Boolean!
+  subtitle: String!
+  title: String!
+  updatedAt: DateTime
+  uuid: String
+}
+
+type PostGroupBy {
+  authorId: Int!
+  avg: PostAvgAggregate
+  content: String
+  count: PostCountAggregate
+  createdAt: DateTime!
+  editorId: Int
+  kind: PostKind
+  max: PostMaxAggregate
+  metadata: JSON!
+  min: PostMinAggregate
+  published: Boolean!
+  subtitle: String!
+  sum: PostSumAggregate
+  title: String!
+  updatedAt: DateTime!
+  uuid: String!
 }
 
 enum PostKind {
@@ -784,16 +1404,60 @@ input PostListRelationFilter {
   some: PostWhereInput
 }
 
+type PostMaxAggregate {
+  authorId: Int!
+  content: String
+  createdAt: DateTime
+  editorId: Int
+  kind: PostKind
+  metadata: JSON
+  published: Boolean
+  subtitle: String
+  title: String
+  updatedAt: DateTime
+  uuid: String
+}
+
+type PostMinAggregate {
+  authorId: Int!
+  content: String
+  createdAt: DateTime
+  editorId: Int
+  kind: PostKind
+  metadata: JSON
+  published: Boolean
+  subtitle: String
+  title: String
+  updatedAt: DateTime
+  uuid: String
+}
+
 input PostOrderByInput {
   authorId: SortOrder
   content: SortOrder
   createdAt: SortOrder
+  editorId: SortOrder
   kind: SortOrder
   metadata: SortOrder
   published: SortOrder
+  subtitle: SortOrder
   title: SortOrder
   updatedAt: SortOrder
   uuid: SortOrder
+}
+
+enum PostScalarFieldEnum {
+  authorId
+  content
+  createdAt
+  editorId
+  kind
+  metadata
+  published
+  subtitle
+  title
+  updatedAt
+  uuid
 }
 
 input PostScalarWhereInput {
@@ -801,89 +1465,230 @@ input PostScalarWhereInput {
   authorId: IntFilter
   content: StringNullableFilter
   createdAt: DateTimeFilter
+  editorId: IntNullableFilter
   kind: EnumPostKindNullableFilter
   metadata: JsonFilter
   NOT: [PostScalarWhereInput!]
   OR: [PostScalarWhereInput!]
   published: BoolFilter
+  subtitle: StringFilter
   title: StringFilter
   updatedAt: DateTimeFilter
   uuid: StringFilter
 }
 
-input PostUpdateManyDataInput {
-  content: NullableStringFieldUpdateOperationsInput
-  createdAt: DateTimeFieldUpdateOperationsInput
-  kind: NullableEnumPostKindFieldUpdateOperationsInput
-  metadata: JsonFieldUpdateOperationsInput
-  published: BoolFieldUpdateOperationsInput
-  title: StringFieldUpdateOperationsInput
-  updatedAt: DateTimeFieldUpdateOperationsInput
-  uuid: StringFieldUpdateOperationsInput
+input PostScalarWhereWithAggregatesInput {
+  AND: [PostScalarWhereWithAggregatesInput!]
+  authorId: IntWithAggregatesFilter
+  content: StringNullableWithAggregatesFilter
+  createdAt: DateTimeWithAggregatesFilter
+  editorId: IntNullableWithAggregatesFilter
+  kind: EnumPostKindNullableWithAggregatesFilter
+  metadata: JsonWithAggregatesFilter
+  NOT: [PostScalarWhereWithAggregatesInput!]
+  OR: [PostScalarWhereWithAggregatesInput!]
+  published: BoolWithAggregatesFilter
+  subtitle: StringWithAggregatesFilter
+  title: StringWithAggregatesFilter
+  updatedAt: DateTimeWithAggregatesFilter
+  uuid: StringWithAggregatesFilter
 }
 
-input PostUpdateManyMutationInput {
+type PostSumAggregate {
+  authorId: Int!
+  editorId: Int
+}
+
+input PostUncheckedCreateInput {
+  authorId: Int!
+  content: String
+  createdAt: DateTime
+  editorId: Int
+  kind: PostKind
+  metadata: JSON!
+  published: Boolean!
+  subtitle: String!
+  title: String!
+  updatedAt: DateTime
+  uuid: String
+}
+
+input PostUncheckedCreateManyWithoutAuthorInput {
+  connect: [PostWhereUniqueInput!]
+  connectOrCreate: [PostCreateOrConnectWithoutauthorInput!]
+  create: [PostCreateWithoutAuthorInput!]
+}
+
+input PostUncheckedCreateManyWithoutEditorInput {
+  connect: [PostWhereUniqueInput!]
+  connectOrCreate: [PostCreateOrConnectWithouteditorInput!]
+  create: [PostCreateWithoutEditorInput!]
+}
+
+input PostUncheckedCreateWithoutAuthorInput {
+  content: String
+  createdAt: DateTime
+  editorId: Int
+  kind: PostKind
+  metadata: JSON!
+  published: Boolean!
+  subtitle: String!
+  title: String!
+  updatedAt: DateTime
+  uuid: String
+}
+
+input PostUncheckedCreateWithoutEditorInput {
+  authorId: Int!
+  content: String
+  createdAt: DateTime
+  kind: PostKind
+  metadata: JSON!
+  published: Boolean!
+  subtitle: String!
+  title: String!
+  updatedAt: DateTime
+  uuid: String
+}
+
+input PostUncheckedUpdateManyInput {
+  authorId: IntFieldUpdateOperationsInput
   content: NullableStringFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
+  editorId: NullableIntFieldUpdateOperationsInput
   kind: NullableEnumPostKindFieldUpdateOperationsInput
   metadata: JSON
   published: BoolFieldUpdateOperationsInput
+  subtitle: StringFieldUpdateOperationsInput
   title: StringFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
   uuid: StringFieldUpdateOperationsInput
 }
 
-input PostUpdateManyWithoutAuthorInput {
+input PostUncheckedUpdateManyWithoutAuthorInput {
   connect: [PostWhereUniqueInput!]
-  connectOrCreate: [PostCreateOrConnectWithoutUserInput!]
+  connectOrCreate: [PostCreateOrConnectWithoutauthorInput!]
   create: [PostCreateWithoutAuthorInput!]
   delete: [PostWhereUniqueInput!]
   deleteMany: [PostScalarWhereInput!]
   disconnect: [PostWhereUniqueInput!]
   set: [PostWhereUniqueInput!]
   update: [PostUpdateWithWhereUniqueWithoutAuthorInput!]
-  updateMany: [PostUpdateManyWithWhereNestedInput!]
+  updateMany: [PostUpdateManyWithWhereWithoutAuthorInput!]
   upsert: [PostUpsertWithWhereUniqueWithoutAuthorInput!]
 }
 
-input PostUpdateManyWithWhereNestedInput {
-  data: PostUpdateManyDataInput!
-  where: PostScalarWhereInput!
+input PostUncheckedUpdateManyWithoutEditorInput {
+  connect: [PostWhereUniqueInput!]
+  connectOrCreate: [PostCreateOrConnectWithouteditorInput!]
+  create: [PostCreateWithoutEditorInput!]
+  delete: [PostWhereUniqueInput!]
+  deleteMany: [PostScalarWhereInput!]
+  disconnect: [PostWhereUniqueInput!]
+  set: [PostWhereUniqueInput!]
+  update: [PostUpdateWithWhereUniqueWithoutEditorInput!]
+  updateMany: [PostUpdateManyWithWhereWithoutEditorInput!]
+  upsert: [PostUpsertWithWhereUniqueWithoutEditorInput!]
 }
 
-input PostUpdateWithoutAuthorDataInput {
+input PostUncheckedUpdateManyWithoutEditorPostsInput {
+  authorId: IntFieldUpdateOperationsInput
   content: NullableStringFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
   kind: NullableEnumPostKindFieldUpdateOperationsInput
-  metadata: JsonFieldUpdateOperationsInput
+  metadata: JSON
   published: BoolFieldUpdateOperationsInput
+  subtitle: StringFieldUpdateOperationsInput
   title: StringFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
   uuid: StringFieldUpdateOperationsInput
 }
 
+input PostUncheckedUpdateManyWithoutPostsInput {
+  content: NullableStringFieldUpdateOperationsInput
+  createdAt: DateTimeFieldUpdateOperationsInput
+  editorId: NullableIntFieldUpdateOperationsInput
+  kind: NullableEnumPostKindFieldUpdateOperationsInput
+  metadata: JSON
+  published: BoolFieldUpdateOperationsInput
+  subtitle: StringFieldUpdateOperationsInput
+  title: StringFieldUpdateOperationsInput
+  updatedAt: DateTimeFieldUpdateOperationsInput
+  uuid: StringFieldUpdateOperationsInput
+}
+
+input PostUncheckedUpdateWithoutAuthorInput {
+  content: NullableStringFieldUpdateOperationsInput
+  createdAt: DateTimeFieldUpdateOperationsInput
+  editorId: NullableIntFieldUpdateOperationsInput
+  kind: NullableEnumPostKindFieldUpdateOperationsInput
+  metadata: JSON
+  published: BoolFieldUpdateOperationsInput
+  subtitle: StringFieldUpdateOperationsInput
+  title: StringFieldUpdateOperationsInput
+  updatedAt: DateTimeFieldUpdateOperationsInput
+  uuid: StringFieldUpdateOperationsInput
+}
+
+input PostUncheckedUpdateWithoutEditorInput {
+  authorId: IntFieldUpdateOperationsInput
+  content: NullableStringFieldUpdateOperationsInput
+  createdAt: DateTimeFieldUpdateOperationsInput
+  kind: NullableEnumPostKindFieldUpdateOperationsInput
+  metadata: JSON
+  published: BoolFieldUpdateOperationsInput
+  subtitle: StringFieldUpdateOperationsInput
+  title: StringFieldUpdateOperationsInput
+  updatedAt: DateTimeFieldUpdateOperationsInput
+  uuid: StringFieldUpdateOperationsInput
+}
+
+input PostUpdateManyWithWhereWithoutAuthorInput {
+  data: PostUncheckedUpdateManyWithoutPostsInput!
+  where: PostScalarWhereInput!
+}
+
+input PostUpdateManyWithWhereWithoutEditorInput {
+  data: PostUncheckedUpdateManyWithoutEditorPostsInput!
+  where: PostScalarWhereInput!
+}
+
 input PostUpdateWithWhereUniqueWithoutAuthorInput {
-  data: PostUpdateWithoutAuthorDataInput!
+  data: PostUncheckedUpdateWithoutAuthorInput!
+  where: PostWhereUniqueInput!
+}
+
+input PostUpdateWithWhereUniqueWithoutEditorInput {
+  data: PostUncheckedUpdateWithoutEditorInput!
   where: PostWhereUniqueInput!
 }
 
 input PostUpsertWithWhereUniqueWithoutAuthorInput {
-  create: PostCreateWithoutAuthorInput!
-  update: PostUpdateWithoutAuthorDataInput!
+  create: PostUncheckedCreateWithoutAuthorInput!
+  update: PostUncheckedUpdateWithoutAuthorInput!
+  where: PostWhereUniqueInput!
+}
+
+input PostUpsertWithWhereUniqueWithoutEditorInput {
+  create: PostUncheckedCreateWithoutEditorInput!
+  update: PostUncheckedUpdateWithoutEditorInput!
   where: PostWhereUniqueInput!
 }
 
 input PostWhereInput {
   AND: [PostWhereInput!]
-  author: ClientWhereInput
+  author: ClientRelationFilter
   authorId: IntFilter
   content: StringNullableFilter
   createdAt: DateTimeFilter
+  editor: ClientRelationFilter
+  editorId: IntNullableFilter
   kind: EnumPostKindNullableFilter
   metadata: JsonFilter
   NOT: [PostWhereInput!]
   OR: [PostWhereInput!]
   published: BoolFilter
+  subtitle: StringFilter
   title: StringFilter
   updatedAt: DateTimeFilter
   uuid: StringFilter
@@ -893,38 +1698,239 @@ input PostWhereUniqueInput {
   uuid: String
 }
 
+type Problem {
+  creator: Creator
+  creatorId: Int
+  id: Int!
+  likedBy(cursor: CreatorWhereUniqueInput, distinct: [CreatorScalarFieldEnum!], orderBy: [CreatorOrderByInput!], skip: Int, take: Int, where: CreatorWhereInput): [Creator!]
+  problemText: String!
+}
+
+type ProblemAvgAggregate {
+  creatorId: Float
+  id: Float!
+}
+
+type ProblemCountAggregate {
+  _all: Int!
+  creatorId: Int
+  id: Int!
+  problemText: Int
+}
+
+input ProblemCreateManyWithoutCreatorInput {
+  connect: [ProblemWhereUniqueInput!]
+  connectOrCreate: [ProblemCreateOrConnectWithoutcreatorInput!]
+  create: [ProblemCreateWithoutCreatorInput!]
+}
+
+input ProblemCreateOrConnectWithoutcreatorInput {
+  create: ProblemUncheckedCreateWithoutCreatorInput!
+  where: ProblemWhereUniqueInput!
+}
+
+input ProblemCreateWithoutCreatorInput {
+  likedBy: CreatorCreateManyWithoutLikesInput
+  problemText: String!
+}
+
+type ProblemGroupBy {
+  avg: ProblemAvgAggregate
+  count: ProblemCountAggregate
+  creatorId: Int
+  id: Int!
+  max: ProblemMaxAggregate
+  min: ProblemMinAggregate
+  problemText: String!
+  sum: ProblemSumAggregate
+}
+
+input ProblemListRelationFilter {
+  every: ProblemWhereInput
+  none: ProblemWhereInput
+  some: ProblemWhereInput
+}
+
+type ProblemMaxAggregate {
+  creatorId: Int
+  id: Int!
+  problemText: String
+}
+
+type ProblemMinAggregate {
+  creatorId: Int
+  id: Int!
+  problemText: String
+}
+
+input ProblemOrderByInput {
+  creatorId: SortOrder
+  id: SortOrder
+  problemText: SortOrder
+}
+
+enum ProblemScalarFieldEnum {
+  creatorId
+  id
+  problemText
+}
+
+input ProblemScalarWhereInput {
+  AND: [ProblemScalarWhereInput!]
+  creatorId: IntNullableFilter
+  id: IntFilter
+  NOT: [ProblemScalarWhereInput!]
+  OR: [ProblemScalarWhereInput!]
+  problemText: StringFilter
+}
+
+input ProblemScalarWhereWithAggregatesInput {
+  AND: [ProblemScalarWhereWithAggregatesInput!]
+  creatorId: IntNullableWithAggregatesFilter
+  id: IntWithAggregatesFilter
+  NOT: [ProblemScalarWhereWithAggregatesInput!]
+  OR: [ProblemScalarWhereWithAggregatesInput!]
+  problemText: StringWithAggregatesFilter
+}
+
+type ProblemSumAggregate {
+  creatorId: Int
+  id: Int!
+}
+
+input ProblemUncheckedCreateInput {
+  creatorId: Int
+  id: Int
+  problemText: String!
+}
+
+input ProblemUncheckedCreateManyWithoutCreatorInput {
+  connect: [ProblemWhereUniqueInput!]
+  connectOrCreate: [ProblemCreateOrConnectWithoutcreatorInput!]
+  create: [ProblemCreateWithoutCreatorInput!]
+}
+
+input ProblemUncheckedCreateWithoutCreatorInput {
+  id: Int
+  problemText: String!
+}
+
+input ProblemUncheckedUpdateInput {
+  creatorId: NullableIntFieldUpdateOperationsInput
+  id: IntFieldUpdateOperationsInput
+  problemText: StringFieldUpdateOperationsInput
+}
+
+input ProblemUncheckedUpdateManyInput {
+  creatorId: NullableIntFieldUpdateOperationsInput
+  id: IntFieldUpdateOperationsInput
+  problemText: StringFieldUpdateOperationsInput
+}
+
+input ProblemUncheckedUpdateManyWithoutCreatorInput {
+  connect: [ProblemWhereUniqueInput!]
+  connectOrCreate: [ProblemCreateOrConnectWithoutcreatorInput!]
+  create: [ProblemCreateWithoutCreatorInput!]
+  delete: [ProblemWhereUniqueInput!]
+  deleteMany: [ProblemScalarWhereInput!]
+  disconnect: [ProblemWhereUniqueInput!]
+  set: [ProblemWhereUniqueInput!]
+  update: [ProblemUpdateWithWhereUniqueWithoutCreatorInput!]
+  updateMany: [ProblemUpdateManyWithWhereWithoutCreatorInput!]
+  upsert: [ProblemUpsertWithWhereUniqueWithoutCreatorInput!]
+}
+
+input ProblemUncheckedUpdateManyWithoutProblemsInput {
+  id: IntFieldUpdateOperationsInput
+  problemText: StringFieldUpdateOperationsInput
+}
+
+input ProblemUncheckedUpdateWithoutCreatorInput {
+  id: IntFieldUpdateOperationsInput
+  problemText: StringFieldUpdateOperationsInput
+}
+
+input ProblemUpdateManyWithWhereWithoutCreatorInput {
+  data: ProblemUncheckedUpdateManyWithoutProblemsInput!
+  where: ProblemScalarWhereInput!
+}
+
+input ProblemUpdateWithWhereUniqueWithoutCreatorInput {
+  data: ProblemUncheckedUpdateWithoutCreatorInput!
+  where: ProblemWhereUniqueInput!
+}
+
+input ProblemUpsertWithWhereUniqueWithoutCreatorInput {
+  create: ProblemUncheckedCreateWithoutCreatorInput!
+  update: ProblemUncheckedUpdateWithoutCreatorInput!
+  where: ProblemWhereUniqueInput!
+}
+
+input ProblemWhereInput {
+  AND: [ProblemWhereInput!]
+  creator: CreatorRelationFilter
+  creatorId: IntNullableFilter
+  id: IntFilter
+  likedBy: CreatorListRelationFilter
+  NOT: [ProblemWhereInput!]
+  OR: [ProblemWhereInput!]
+  problemText: StringFilter
+}
+
+input ProblemWhereUniqueInput {
+  id: Int
+}
+
 type Query {
-  aggregateCategory(cursor: CategoryWhereUniqueInput, distinct: [CategoryDistinctFieldEnum!], orderBy: [CategoryOrderByInput!], skip: Int, take: Int, where: CategoryWhereInput): AggregateCategory!
-  aggregateClient(cursor: ClientWhereUniqueInput, distinct: [ClientDistinctFieldEnum!], orderBy: [ClientOrderByInput!], skip: Int, take: Int, where: ClientWhereInput): AggregateClient!
-  aggregateDirector(cursor: DirectorWhereUniqueInput, distinct: [DirectorDistinctFieldEnum!], orderBy: [DirectorOrderByInput!], skip: Int, take: Int, where: DirectorWhereInput): AggregateDirector!
-  aggregateMovie(cursor: MovieWhereUniqueInput, distinct: [MovieDistinctFieldEnum!], orderBy: [MovieOrderByInput!], skip: Int, take: Int, where: MovieWhereInput): AggregateMovie!
-  aggregatePatient(cursor: PatientWhereUniqueInput, distinct: [PatientDistinctFieldEnum!], orderBy: [PatientOrderByInput!], skip: Int, take: Int, where: PatientWhereInput): AggregatePatient!
+  aggregateClient(cursor: ClientWhereUniqueInput, orderBy: [ClientOrderByInput!], skip: Int, take: Int, where: ClientWhereInput): AggregateClient!
+  aggregateCreator(cursor: CreatorWhereUniqueInput, orderBy: [CreatorOrderByInput!], skip: Int, take: Int, where: CreatorWhereInput): AggregateCreator!
+  aggregateDirector(cursor: DirectorWhereUniqueInput, orderBy: [DirectorOrderByInput!], skip: Int, take: Int, where: DirectorWhereInput): AggregateDirector!
+  aggregateMovie(cursor: MovieWhereUniqueInput, orderBy: [MovieOrderByInput!], skip: Int, take: Int, where: MovieWhereInput): AggregateMovie!
+  aggregatePatient(cursor: PatientWhereUniqueInput, orderBy: [PatientOrderByInput!], skip: Int, take: Int, where: PatientWhereInput): AggregatePatient!
+  aggregateProblem(cursor: ProblemWhereUniqueInput, orderBy: [ProblemOrderByInput!], skip: Int, take: Int, where: ProblemWhereInput): AggregateProblem!
   allClients: [Client!]!
   allPosts: [Post!]!
-  categories(cursor: CategoryWhereUniqueInput, distinct: [CategoryDistinctFieldEnum!], orderBy: [CategoryOrderByInput!], skip: Int, take: Int, where: CategoryWhereInput): [Category!]!
-  category(where: CategoryWhereUniqueInput!): Category
+  categories(cursor: CategoryWhereUniqueInput, distinct: [CategoryScalarFieldEnum!], orderBy: [CategoryOrderByInput!], skip: Int, take: Int, where: CategoryWhereInput): [Category!]!
   client(where: ClientWhereUniqueInput!): Client
-  clients(cursor: ClientWhereUniqueInput, distinct: [ClientDistinctFieldEnum!], orderBy: [ClientOrderByInput!], skip: Int, take: Int, where: ClientWhereInput): [Client!]!
-  customFindClientsWithArgs(cursor: ClientWhereUniqueInput, distinct: [ClientDistinctFieldEnum!], orderBy: [ClientOrderByInput!], skip: Int, take: Int, where: ClientWhereInput): [Client!]!
+  clients(cursor: ClientWhereUniqueInput, distinct: [ClientScalarFieldEnum!], orderBy: [ClientOrderByInput!], skip: Int, take: Int, where: ClientWhereInput): [Client!]!
+  creator(where: CreatorWhereUniqueInput!): Creator
+  creators(cursor: CreatorWhereUniqueInput, distinct: [CreatorScalarFieldEnum!], orderBy: [CreatorOrderByInput!], skip: Int, take: Int, where: CreatorWhereInput): [Creator!]!
+  customFindClientsWithArgs(cursor: ClientWhereUniqueInput, distinct: [ClientScalarFieldEnum!], orderBy: [ClientOrderByInput!], skip: Int, take: Int, where: ClientWhereInput): [Client!]!
   director(where: DirectorWhereUniqueInput!): Director
-  directors(cursor: DirectorWhereUniqueInput, distinct: [DirectorDistinctFieldEnum!], orderBy: [DirectorOrderByInput!], skip: Int, take: Int, where: DirectorWhereInput): [Director!]!
+  directors(cursor: DirectorWhereUniqueInput, distinct: [DirectorScalarFieldEnum!], orderBy: [DirectorOrderByInput!], skip: Int, take: Int, where: DirectorWhereInput): [Director!]!
+  findFirstClient(cursor: ClientWhereUniqueInput, distinct: [ClientScalarFieldEnum!], orderBy: [ClientOrderByInput!], skip: Int, take: Int, where: ClientWhereInput): Client
+  findFirstCreator(cursor: CreatorWhereUniqueInput, distinct: [CreatorScalarFieldEnum!], orderBy: [CreatorOrderByInput!], skip: Int, take: Int, where: CreatorWhereInput): Creator
+  findFirstDirector(cursor: DirectorWhereUniqueInput, distinct: [DirectorScalarFieldEnum!], orderBy: [DirectorOrderByInput!], skip: Int, take: Int, where: DirectorWhereInput): Director
+  findFirstMovie(cursor: MovieWhereUniqueInput, distinct: [MovieScalarFieldEnum!], orderBy: [MovieOrderByInput!], skip: Int, take: Int, where: MovieWhereInput): Movie
+  findFirstPatient(cursor: PatientWhereUniqueInput, distinct: [PatientScalarFieldEnum!], orderBy: [PatientOrderByInput!], skip: Int, take: Int, where: PatientWhereInput): Patient
+  findFirstProblem(cursor: ProblemWhereUniqueInput, distinct: [ProblemScalarFieldEnum!], orderBy: [ProblemOrderByInput!], skip: Int, take: Int, where: ProblemWhereInput): Problem
+  groupByCategory(by: [CategoryScalarFieldEnum!]!, having: CategoryScalarWhereWithAggregatesInput, orderBy: [CategoryOrderByInput!], skip: Int, take: Int, where: CategoryWhereInput): [CategoryGroupBy!]!
+  groupByClient(by: [ClientScalarFieldEnum!]!, having: ClientScalarWhereWithAggregatesInput, orderBy: [ClientOrderByInput!], skip: Int, take: Int, where: ClientWhereInput): [ClientGroupBy!]!
+  groupByCreator(by: [CreatorScalarFieldEnum!]!, having: CreatorScalarWhereWithAggregatesInput, orderBy: [CreatorOrderByInput!], skip: Int, take: Int, where: CreatorWhereInput): [CreatorGroupBy!]!
+  groupByDirector(by: [DirectorScalarFieldEnum!]!, having: DirectorScalarWhereWithAggregatesInput, orderBy: [DirectorOrderByInput!], skip: Int, take: Int, where: DirectorWhereInput): [DirectorGroupBy!]!
+  groupByMovie(by: [MovieScalarFieldEnum!]!, having: MovieScalarWhereWithAggregatesInput, orderBy: [MovieOrderByInput!], skip: Int, take: Int, where: MovieWhereInput): [MovieGroupBy!]!
+  groupByPatient(by: [PatientScalarFieldEnum!]!, having: PatientScalarWhereWithAggregatesInput, orderBy: [PatientOrderByInput!], skip: Int, take: Int, where: PatientWhereInput): [PatientGroupBy!]!
+  groupByPost(by: [PostScalarFieldEnum!]!, having: PostScalarWhereWithAggregatesInput, orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): [PostGroupBy!]!
+  groupByProblem(by: [ProblemScalarFieldEnum!]!, having: ProblemScalarWhereWithAggregatesInput, orderBy: [ProblemOrderByInput!], skip: Int, take: Int, where: ProblemWhereInput): [ProblemGroupBy!]!
   movie(where: MovieWhereUniqueInput!): Movie
-  movies(cursor: MovieWhereUniqueInput, distinct: [MovieDistinctFieldEnum!], orderBy: [MovieOrderByInput!], skip: Int, take: Int, where: MovieWhereInput): [Movie!]!
+  movies(cursor: MovieWhereUniqueInput, distinct: [MovieScalarFieldEnum!], orderBy: [MovieOrderByInput!], skip: Int, take: Int, where: MovieWhereInput): [Movie!]!
   patient(where: PatientWhereUniqueInput!): Patient
-  patients(cursor: PatientWhereUniqueInput, distinct: [PatientDistinctFieldEnum!], orderBy: [PatientOrderByInput!], skip: Int, take: Int, where: PatientWhereInput): [Patient!]!
+  patients(cursor: PatientWhereUniqueInput, distinct: [PatientScalarFieldEnum!], orderBy: [PatientOrderByInput!], skip: Int, take: Int, where: PatientWhereInput): [Patient!]!
   post(where: PostWhereUniqueInput!): Post
-  posts(cursor: PostWhereUniqueInput, distinct: [PostDistinctFieldEnum!], orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): [Post!]!
+  posts(cursor: PostWhereUniqueInput, distinct: [PostScalarFieldEnum!], orderBy: [PostOrderByInput!], skip: Int, take: Int, where: PostWhereInput): [Post!]!
+  problem(where: ProblemWhereUniqueInput!): Problem
+  problems(cursor: ProblemWhereUniqueInput, distinct: [ProblemScalarFieldEnum!], orderBy: [ProblemOrderByInput!], skip: Int, take: Int, where: ProblemWhereInput): [Problem!]!
+}
+
+enum QueryMode {
+  default
+  insensitive
 }
 
 """Role enum doc"""
 enum Role {
   ADMIN
   USER
-}
-
-input SlugNumberCompoundUniqueInput {
-  number: Int!
-  slug: String!
 }
 
 enum SortOrder {
@@ -945,6 +1951,7 @@ input StringFilter {
   in: [String!]
   lt: String
   lte: String
+  mode: QueryMode
   not: NestedStringFilter
   notIn: [String!]
   startsWith: String
@@ -959,7 +1966,44 @@ input StringNullableFilter {
   in: [String!]
   lt: String
   lte: String
+  mode: QueryMode
   not: NestedStringNullableFilter
+  notIn: [String!]
+  startsWith: String
+}
+
+input StringNullableWithAggregatesFilter {
+  contains: String
+  count: NestedIntNullableFilter
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  max: NestedStringNullableFilter
+  min: NestedStringNullableFilter
+  mode: QueryMode
+  not: NestedStringNullableWithAggregatesFilter
+  notIn: [String!]
+  startsWith: String
+}
+
+input StringWithAggregatesFilter {
+  contains: String
+  count: NestedIntFilter
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  max: NestedStringFilter
+  min: NestedStringFilter
+  mode: QueryMode
+  not: NestedStringWithAggregatesFilter
   notIn: [String!]
   startsWith: String
 }

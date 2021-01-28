@@ -1,44 +1,38 @@
 import * as TypeGraphQL from "type-graphql";
 import GraphQLJSON from "graphql-type-json";
-import { JsonValue, InputJsonValue } from "../../../client";
-import { DirectorCreateOrConnectWithoutMovieInput } from "../inputs/DirectorCreateOrConnectWithoutMovieInput";
-import { DirectorCreateWithoutMoviesInput } from "../inputs/DirectorCreateWithoutMoviesInput";
-import { DirectorUpdateWithoutMoviesDataInput } from "../inputs/DirectorUpdateWithoutMoviesDataInput";
+import { Prisma } from "../../../client";
+import { DirectorCreateOrConnectWithoutmoviesInput } from "../inputs/DirectorCreateOrConnectWithoutmoviesInput";
+import { DirectorUncheckedCreateWithoutMoviesInput } from "../inputs/DirectorUncheckedCreateWithoutMoviesInput";
+import { DirectorUncheckedUpdateWithoutMoviesInput } from "../inputs/DirectorUncheckedUpdateWithoutMoviesInput";
 import { DirectorUpsertWithoutMoviesInput } from "../inputs/DirectorUpsertWithoutMoviesInput";
 import { DirectorWhereUniqueInput } from "../inputs/DirectorWhereUniqueInput";
 
 @TypeGraphQL.InputType({
-  isAbstract: true,
-  description: undefined,
+  isAbstract: true
 })
 export class DirectorUpdateOneRequiredWithoutMoviesInput {
-  @TypeGraphQL.Field(_type => DirectorCreateWithoutMoviesInput, {
-    nullable: true,
-    description: undefined
+  @TypeGraphQL.Field(_type => DirectorUncheckedCreateWithoutMoviesInput, {
+    nullable: true
   })
-  create?: DirectorCreateWithoutMoviesInput | undefined;
+  create?: DirectorUncheckedCreateWithoutMoviesInput | undefined;
 
   @TypeGraphQL.Field(_type => DirectorWhereUniqueInput, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
   connect?: DirectorWhereUniqueInput | undefined;
 
-  @TypeGraphQL.Field(_type => DirectorUpdateWithoutMoviesDataInput, {
-    nullable: true,
-    description: undefined
+  @TypeGraphQL.Field(_type => DirectorUncheckedUpdateWithoutMoviesInput, {
+    nullable: true
   })
-  update?: DirectorUpdateWithoutMoviesDataInput | undefined;
+  update?: DirectorUncheckedUpdateWithoutMoviesInput | undefined;
 
   @TypeGraphQL.Field(_type => DirectorUpsertWithoutMoviesInput, {
-    nullable: true,
-    description: undefined
+    nullable: true
   })
   upsert?: DirectorUpsertWithoutMoviesInput | undefined;
 
-  @TypeGraphQL.Field(_type => DirectorCreateOrConnectWithoutMovieInput, {
-    nullable: true,
-    description: undefined
+  @TypeGraphQL.Field(_type => DirectorCreateOrConnectWithoutmoviesInput, {
+    nullable: true
   })
-  connectOrCreate?: DirectorCreateOrConnectWithoutMovieInput | undefined;
+  connectOrCreate?: DirectorCreateOrConnectWithoutmoviesInput | undefined;
 }

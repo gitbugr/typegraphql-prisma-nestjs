@@ -9,13 +9,16 @@ generator client {
   provider        = "prisma-client-js"
   binaryTargets   = ["windows", "debian-openssl-1.1.x"]
   output          = "../prisma/generated/client"
-  previewFeatures = ["connectOrCreate", "atomicNumberOperations"]
+  // previewFeatures = ["nativeTypes"]
+  previewFeatures = ["groupBy"]
 }
 
 generator typegraphql {
-  provider = "node ../src/cli/dev.ts"
-  output   = "../prisma/generated/type-graphql"
-  emitDMMF = true
+  provider                 = "node ../src/cli/dev.ts"
+  output                   = "../prisma/generated/type-graphql"
+  emitDMMF                 = true
+  simpleResolvers          = false
+  useUncheckedScalarInputs = true
 }
 
 // Role enum comment
@@ -27,22 +30,24 @@ enum Role {
 
 // User model comment
 /// User model doc
-/// @@TypeGraphQL.type("Client")
+/// @@TypeGraphQL.type(name: "Client")
 model User {
   // User model field comment
   /// User model field doc
-  id      Int     @default(autoincrement()) @id
-  email   String  @unique
+  id          Int     @id @default(autoincrement())
+  email       String  @unique
   /// renamed field doc
-  /// @TypeGraphQL.field("firstName")
-  name    String?
-  age     Int
-  /// @TypeGraphQL.field("accountBalance")
-  balance Numeric
-  amount  Float
-  /// @TypeGraphQL.field("clientPosts")
-  posts   post[]
-  role    Role
+  /// @TypeGraphQL.field(name: "firstName")
+  name        String?
+  age         Int
+  /// @TypeGraphQL.field(name: "accountBalance")
+  balance     Numeric
+  amount      Float
+  /// @TypeGraphQL.field(name: "clientPosts")
+  posts       post[]  @relation("posts")
+  role        Role
+  /// @TypeGraphQL.omit(output: true)
+  editorPosts post[]  @relation("editorPosts")
 }
 
 enum PostKind {
@@ -51,14 +56,20 @@ enum PostKind {
 }
 
 model post {
-  uuid      String    @default(uuid()) @id
+  uuid      String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   published Boolean
   title     String
+  /// @TypeGraphQL.omit(output: true)
+  subtitle  String
   content   String?
-  author    User      @relation(fields: [authorId], references: [id])
+  author    User      @relation(fields: [authorId], references: [id], name: "posts")
   authorId  Int
+  /// @TypeGraphQL.omit(output: true)
+  editor    User?     @relation(fields: [editorId], references: [id], name: "editorPosts")
+  /// @TypeGraphQL.omit(output: true)
+  editorId  Int?
   kind      PostKind?
   metadata  Json
 }
@@ -95,3 +106,32 @@ model Director {
 
   @@id([firstName, lastName])
 }
+
+model Problem {
+  id          Int       @id @default(autoincrement())
+  problemText String
+  likedBy     Creator[]
+  creator     Creator?  @relation(name: "creator", fields: [creatorId], references: [id])
+  creatorId   Int?
+}
+
+model Creator {
+  id       Int       @id @default(autoincrement())
+  name     String
+  likes    Problem[]
+  problems Problem[] @relation("creator")
+}
+
+// model Catalog {
+//   id                       Int          @id @default(autoincrement())
+//   productName              String?
+//   status                   curatestatus @default(unreviewed)
+//   createdAt                DateTime     @default(now())
+// }
+
+// enum curatestatus {
+//   accepted
+//   declined
+//   pending
+//   unreviewed
+// }

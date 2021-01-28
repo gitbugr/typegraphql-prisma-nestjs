@@ -1,17 +1,23 @@
 import * as TypeGraphQL from "type-graphql";
 import GraphQLJSON from "graphql-type-json";
-import { PatientCreateInput } from "../../../inputs/PatientCreateInput";
-import { PatientUpdateInput } from "../../../inputs/PatientUpdateInput";
+import { PatientUncheckedCreateInput } from "../../../inputs/PatientUncheckedCreateInput";
+import { PatientUncheckedUpdateInput } from "../../../inputs/PatientUncheckedUpdateInput";
 import { PatientWhereUniqueInput } from "../../../inputs/PatientWhereUniqueInput";
 
 @TypeGraphQL.ArgsType()
 export class UpsertPatientArgs {
-  @TypeGraphQL.Field(_type => PatientWhereUniqueInput, { nullable: false })
+  @TypeGraphQL.Field(_type => PatientWhereUniqueInput, {
+    nullable: false
+  })
   where!: PatientWhereUniqueInput;
 
-  @TypeGraphQL.Field(_type => PatientCreateInput, { nullable: false })
-  create!: PatientCreateInput;
+  @TypeGraphQL.Field(_type => PatientUncheckedCreateInput, {
+    nullable: false
+  })
+  create!: PatientUncheckedCreateInput;
 
-  @TypeGraphQL.Field(_type => PatientUpdateInput, { nullable: false })
-  update!: PatientUpdateInput;
+  @TypeGraphQL.Field(_type => PatientUncheckedUpdateInput, {
+    nullable: false
+  })
+  update!: PatientUncheckedUpdateInput;
 }

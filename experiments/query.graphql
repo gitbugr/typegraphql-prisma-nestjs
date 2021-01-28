@@ -29,7 +29,7 @@ mutation AddClient {
     data: {
       age: 50
       amount: 123
-      accountBalance: 0
+      accountBalance: 50
       email: "test3@test3.test3"
       firstName: "Test"
       role: USER
@@ -73,7 +73,7 @@ query FindClientsWithEmptyBalance {
 }
 
 query FindPostsOfAdmins {
-  posts(where: { author: { role: { equals: ADMIN } } }) {
+  posts(where: { author: { is: { role: { equals: ADMIN } } } }) {
     ...PostData
     author {
       ...ClientData
@@ -152,7 +152,9 @@ query CountBravoPatients {
   countBravoPatients: aggregatePatient(
     where: { lastName: { contains: "Bravo" } }
   ) {
-    count
+    count {
+      _all
+    }
   }
 }
 
@@ -163,7 +165,7 @@ query FilterPostsByJson {
     ...PostData
   }
   notPublishedAndOthers: posts(
-    where: { metadata: { not: { equals: { publishedOnWikiLeaks: false } } } }
+    where: { metadata: { not: { publishedOnWikiLeaks: false } } }
   ) {
     ...PostData
   }
@@ -171,7 +173,9 @@ query FilterPostsByJson {
 
 query AggregateClient {
   aggregateClient {
-    count
+    count {
+      _all
+    }
     avg {
       age
     }
@@ -188,24 +192,43 @@ query AggregateClient {
   }
 }
 
-mutation ConnectOrCreateExample {
+# # incompatible with useUncheckedScalarInputs
+# mutation ConnectOrCreateExample {
+#   createPost(
+#     data: {
+#       title: "Test"
+#       subtitle: "Test test"
+#       metadata: {}
+#       published: true
+#       author: {
+#         connectOrCreate: {
+#           where: { id: 1 }
+#           create: {
+#             email: "test1@test.test"
+#             accountBalance: 0
+#             role: ADMIN
+#             amount: 0
+#             age: 11
+#           }
+#         }
+#       }
+#     }
+#   ) {
+#     ...PostData
+#     author {
+#       ...ClientData
+#     }
+#   }
+# }
+
+mutation UncheckedInputsExample {
   createPost(
     data: {
       title: "Test"
+      subtitle: "Test test"
       metadata: {}
       published: true
-      author: {
-        connectOrCreate: {
-          where: { id: 1 }
-          create: {
-            email: "test1@test.test"
-            accountBalance: 0
-            role: ADMIN
-            amount: 0
-            age: 11
-          }
-        }
-      }
+      authorId: 1
     }
   ) {
     ...PostData
@@ -221,5 +244,22 @@ mutation AtomicNumberOperations {
     where: { email: "test1@test.test" }
   ) {
     ...ClientData
+  }
+}
+
+query ForbiddenCategories {
+  categories {
+    name
+    slug
+    number
+  }
+}
+
+query GroupPosts {
+  groupByPost(by: [kind], where: { author: { is: { id: { equals: 2 } } } }) {
+    kind
+    count {
+      _all
+    }
   }
 }

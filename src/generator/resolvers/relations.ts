@@ -1,4 +1,9 @@
-import { OptionalKind, MethodDeclarationStructure, Project } from "ts-morph";
+import {
+  OptionalKind,
+  MethodDeclarationStructure,
+  Project,
+  Writers,
+} from "ts-morph";
 import path from "path";
 
 import { camelCase } from "../helpers";
@@ -99,10 +104,10 @@ export default function generateRelationsResolverClassesFromModel(
               name: "ResolveField",
               arguments: [
                 `_type => ${field.typeGraphQLType}`,
-                `{
-                  nullable: ${!field.isRequired},
-                  description: ${field.docs ? `"${field.docs}"` : "undefined"},
-                }`,
+                Writers.object({
+                  nullable: `${!field.isRequired}`,
+                  ...(field.docs && { description: `"${field.docs}"` }),
+                }),
               ],
             },
           ],
@@ -130,7 +135,7 @@ export default function generateRelationsResolverClassesFromModel(
           ],
           // TODO: refactor to AST
           statements: [
-            `return ctx.prisma.${camelCase(model.name)}.findOne({
+            `return ctx.prisma.${camelCase(model.name)}.findUnique({
               where: {${whereConditionString}},
             }).${field.name}(${field.argsTypeName ? "args" : "{}"});`,
           ],

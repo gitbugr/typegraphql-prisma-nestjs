@@ -7,23 +7,23 @@ import {
   FieldResolver,
   Ctx,
   Args,
+  Mutation,
+  Authorized,
+  Extensions,
 } from "type-graphql";
 import { ApolloServer } from "apollo-server";
 import path from "path";
 
 import {
   Client,
-  // Client as BaseClient,
   ClientRelationsResolver,
   ClientCrudResolver,
   Post,
-  // Post as BasePost,
   PostRelationsResolver,
-  FindOnePostResolver,
+  FindUniquePostResolver,
   CreatePostResolver,
   UpdateManyPostResolver,
   // Category,
-  CategoryCrudResolver,
   // Patient,
   PatientCrudResolver,
   FindManyPostResolver,
@@ -32,14 +32,66 @@ import {
   DirectorRelationsResolver,
   MovieRelationsResolver,
   FindManyClientArgs,
+  ProblemRelationsResolver,
+  CreatorRelationsResolver,
+  CreatePostArgs,
+  ResolversEnhanceMap,
+  applyResolversEnhanceMap,
+  ResolverActionsConfig,
+  FindManyCategoryResolver,
+  ModelsEnhanceMap,
+  applyModelsEnhanceMap,
+  ModelConfig,
+  applyOutputTypesEnhanceMap,
+  OutputTypeConfig,
+  GroupByCategoryResolver,
+  GroupByPostResolver,
 } from "./prisma/generated/type-graphql";
 import { PrismaClient } from "./prisma/generated/client";
+import * as Prisma from "./prisma/generated/client";
+import { ProblemCrudResolver } from "./prisma/generated/type-graphql/resolvers/crud/Problem/ProblemCrudResolver";
+import { CreatorCrudResolver } from "./prisma/generated/type-graphql/resolvers/crud/Creator/CreatorCrudResolver";
 
-// @ObjectType()
-// class User extends BaseUser {}
+const problemTypeFieldsConfig: ModelConfig<"Problem"> = {
+  fields: {
+    likedBy: [Authorized()],
+  },
+};
+const modelsEnhanceMap: ModelsEnhanceMap = {
+  Problem: problemTypeFieldsConfig,
+  Director: {
+    class: [Extensions({ isDirector: true })],
+    fields: {
+      movies: [Authorized()],
+    },
+  },
+};
+applyModelsEnhanceMap(modelsEnhanceMap);
 
-// @ObjectType()
-// class Post extends BasePost {}
+const aggregateClientConfig: OutputTypeConfig<"AggregateClient"> = {
+  fields: {
+    avg: [Extensions({ complexity: 10 })],
+  },
+};
+applyOutputTypesEnhanceMap({
+  AggregateClient: aggregateClientConfig,
+  ClientAvgAggregate: {
+    fields: {
+      age: [Authorized()],
+    },
+  },
+});
+
+const problemActionsConfig: ResolverActionsConfig<"Problem"> = {
+  createProblem: [Authorized()],
+};
+const resolversEnhanceMap: ResolversEnhanceMap = {
+  Category: {
+    categories: [Authorized()],
+  },
+  Problem: problemActionsConfig,
+};
+applyResolversEnhanceMap(resolversEnhanceMap);
 
 interface Context {
   prisma: PrismaClient;
@@ -48,15 +100,15 @@ interface Context {
 @Resolver(of => Client)
 class ClientResolver {
   @Query(returns => [Client])
-  async allClients(@Ctx() { prisma }: Context): Promise<Client[]> {
-    return (await prisma.user.findMany()) as Client[];
+  async allClients(@Ctx() { prisma }: Context): Promise<Prisma.User[]> {
+    return await prisma.user.findMany();
   }
 
   @Query(returns => [Client])
   async customFindClientsWithArgs(
     @Args() args: FindManyClientArgs,
     @Ctx() { prisma }: Context,
-  ) {
+  ): Promise<Prisma.User[]> {
     return prisma.user.findMany(args);
   }
 
@@ -72,6 +124,14 @@ class PostResolver {
   async allPosts(@Ctx() { prisma }: Context): Promise<Post[]> {
     return (await prisma.post.findMany()) as Post[];
   }
+
+  @Mutation(returns => Post)
+  async customCreatePost(
+    @Ctx() { prisma }: Context,
+    @Args() args: CreatePostArgs,
+  ): Promise<Post> {
+    return await prisma.post.create(args);
+  }
 }
 
 async function main() {
@@ -82,25 +142,40 @@ async function main() {
       ClientCrudResolver,
       PostResolver,
       PostRelationsResolver,
-      FindOnePostResolver,
+      FindUniquePostResolver,
       CreatePostResolver,
       UpdateManyPostResolver,
-      CategoryCrudResolver,
+      // CategoryCrudResolver,
+      FindManyCategoryResolver,
       PatientCrudResolver,
       FindManyPostResolver,
       MovieCrudResolver,
       MovieRelationsResolver,
       DirectorCrudResolver,
       DirectorRelationsResolver,
+      ProblemCrudResolver,
+      CreatorCrudResolver,
+      ProblemRelationsResolver,
+      CreatorRelationsResolver,
+      GroupByCategoryResolver,
+      GroupByPostResolver,
     ],
     validate: false,
     emitSchemaFile: path.resolve(__dirname, "./generated-schema.graphql"),
+    authChecker: ({ info }) => {
+      console.log(
+        `${info.parentType.name}.${info.fieldName} requested, access prohibited`,
+      );
+      return false;
+    },
   });
 
   const prisma = new PrismaClient({
     // see dataloader for relations in action
     log: ["query"],
   });
+
+  await prisma.$connect();
 
   const server = new ApolloServer({
     schema,

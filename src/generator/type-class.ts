@@ -4,6 +4,7 @@ import {
   Project,
   GetAccessorDeclarationStructure,
   SetAccessorDeclarationStructure,
+  Writers,
 } from "ts-morph";
 import path from "path";
 
@@ -35,6 +36,7 @@ export function generateOutputTypeClassFromType(
   const fieldArgsTypeNames = type.fields
     .filter(it => it.argsTypeName)
     .map(it => it.argsTypeName!);
+  const isAggregateOutputType = type.name.includes("Aggregate");
 
   generateTypeGraphQLImport(sourceFile);
   generateGraphQLScalarImport(sourceFile);
@@ -43,9 +45,17 @@ export function generateOutputTypeClassFromType(
   generateOutputsImports(
     sourceFile,
     type.fields
-      .filter(field => field.outputType.kind === "object")
+      .filter(field => field.outputType.location === "outputObjectTypes")
       .map(field => field.outputType.type),
     1,
+  );
+  generateEnumsImports(
+    sourceFile,
+    type.fields
+      .map(field => field.outputType)
+      .filter(fieldType => fieldType.location === "enumTypes")
+      .map(fieldType => fieldType.type),
+    2,
   );
 
   sourceFile.addClass({
@@ -55,32 +65,33 @@ export function generateOutputTypeClassFromType(
       {
         name: "ObjectType",
         arguments: [
-          `{
-            isAbstract: true,
-            description: undefined,
-          }`,
+          Writers.object({
+            isAbstract: "true",
+            ...(dmmfDocument.options.simpleResolvers && {
+              simpleResolvers: "true",
+            }),
+          }),
         ],
       },
     ],
     properties: type.fields.map<OptionalKind<PropertyDeclarationStructure>>(
       field => {
-        const isRequired = field.outputType.isRequired;
-
+        // workaround for non-optional aggregate result fields in Prisma Client
+        const isOptional = isAggregateOutputType ? false : !field.isRequired;
         return {
           name: field.name,
           type: field.fieldTSType,
-          hasExclamationToken: isRequired,
-          hasQuestionToken: !isRequired,
+          hasExclamationToken: !isOptional,
+          hasQuestionToken: isOptional,
           trailingTrivia: "\r\n",
           decorators: [
             {
               name: "Field",
               arguments: [
                 `_type => ${field.typeGraphQLType}`,
-                `{
-                  nullable: ${!isRequired},
-                  description: undefined
-                }`,
+                Writers.object({
+                  nullable: `${!field.isRequired}`,
+                }),
               ],
             },
           ],
@@ -112,7 +123,7 @@ export function generateInputTypeClassFromType(
   generateInputsImports(
     sourceFile,
     inputType.fields
-      .filter(field => field.selectedInputType.kind === "object")
+      .filter(field => field.selectedInputType.location === "inputObjectTypes")
       .map(field => field.selectedInputType.type)
       .filter(fieldType => fieldType !== inputType.typeName),
   );
@@ -120,7 +131,7 @@ export function generateInputTypeClassFromType(
     sourceFile,
     inputType.fields
       .map(field => field.selectedInputType)
-      .filter(fieldType => fieldType.kind === "enum")
+      .filter(fieldType => fieldType.location === "enumTypes")
       .map(fieldType => fieldType.type as string),
     2,
   );
@@ -134,22 +145,20 @@ export function generateInputTypeClassFromType(
       {
         name: "InputType",
         arguments: [
-          `{
-            isAbstract: true,
-            description: undefined,
-          }`,
+          Writers.object({
+            isAbstract: "true",
+          }),
         ],
       },
     ],
     properties: inputType.fields.map<
       OptionalKind<PropertyDeclarationStructure>
     >(field => {
-      const isOptional = !field.selectedInputType.isRequired;
       return {
         name: field.name,
         type: field.fieldTSType,
-        hasExclamationToken: !isOptional,
-        hasQuestionToken: isOptional,
+        hasExclamationToken: !!field.isRequired,
+        hasQuestionToken: !field.isRequired,
         trailingTrivia: "\r\n",
         decorators: field.hasMappedName
           ? []
@@ -158,10 +167,9 @@ export function generateInputTypeClassFromType(
                 name: "Field",
                 arguments: [
                   `_type => ${field.typeGraphQLType}`,
-                  `{
-                      nullable: ${isOptional},
-                      description: undefined
-                    }`,
+                  Writers.object({
+                    nullable: `${!field.isRequired}`,
+                  }),
                 ],
               },
             ],
@@ -173,8 +181,8 @@ export function generateInputTypeClassFromType(
       return {
         name: field.typeName,
         type: field.fieldTSType,
-        hasExclamationToken: field.selectedInputType.isRequired,
-        hasQuestionToken: !field.selectedInputType.isRequired,
+        hasExclamationToken: field.isRequired,
+        hasQuestionToken: !field.isRequired,
         trailingTrivia: "\r\n",
         statements: [`return this.${field.name};`],
         decorators: [
@@ -182,10 +190,9 @@ export function generateInputTypeClassFromType(
             name: "Field",
             arguments: [
               `_type => ${field.typeGraphQLType}`,
-              `{
-                  nullable: ${!field.selectedInputType.isRequired},
-                  description: undefined
-                }`,
+              Writers.object({
+                nullable: `${!field.isRequired}`,
+              }),
             ],
           },
         ],
@@ -197,8 +204,8 @@ export function generateInputTypeClassFromType(
       return {
         name: field.typeName,
         type: field.fieldTSType,
-        hasExclamationToken: field.selectedInputType.isRequired,
-        hasQuestionToken: !field.selectedInputType.isRequired,
+        hasExclamationToken: field.isRequired,
+        hasQuestionToken: !field.isRequired,
         trailingTrivia: "\r\n",
         parameters: [{ name: field.name, type: field.fieldTSType }],
         statements: [`this.${field.name} = ${field.name};`],

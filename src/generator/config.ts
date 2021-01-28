@@ -1,18 +1,20 @@
 import { DMMF } from "./dmmf/types";
 
-export type BaseKeys = keyof Pick<DMMF.Mapping, "model" | "plural">;
+export type BaseKeys = keyof Pick<DMMF.ModelMapping, "model" | "plural">;
 export const baseKeys: BaseKeys[] = ["model", "plural"];
 
-export type ModelKeys = keyof Exclude<DMMF.Mapping, BaseKeys>;
+export type ModelKeys = keyof Exclude<DMMF.ModelMapping, BaseKeys>;
 
 export type SupportedQueries = keyof Pick<
   typeof DMMF.ModelAction,
-  "findOne" | "findMany" | "aggregate"
+  "findUnique" | "findFirst" | "findMany" | "aggregate" | "groupBy"
 >;
 export const supportedQueryActions: SupportedQueries[] = [
-  "findOne",
+  "findUnique",
+  "findFirst",
   "findMany",
   "aggregate",
+  "groupBy",
 ];
 
 export type SupportedMutations = keyof Pick<

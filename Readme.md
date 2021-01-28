@@ -30,11 +30,11 @@ https://github.com/EndyKaufman/typegraphql-prisma-nestjs-example
 
 ---
 
-![integration logo](https://raw.githubusercontent.com/EndyKaufman/typegraphql-prisma-nestjs/prisma/img/integration.png)
+![integration logo](https://raw.githubusercontent.com/EndyKaufman/typegraphql-prisma-nestjs/prisma/main/img/integration.png)
 
 # TypeGraphQL & Prisma 2 integration
 
-Prisma 2 generator to emit TypeGraphQL type classes and resolvers
+Prisma 2 generator to emit TypeGraphQL types and CRUD resolvers from your Prisma 2 schema
 
 ## Installation
 
@@ -44,14 +44,17 @@ Fist of all, you have to install the generator, as a dev dependency:
 npm i -D typegraphql-prisma-nestjs
 ```
 
-Futhermore, `typegraphql-prisma` to work properly requires `prisma` to be, so please install prisma dependencies if you don't have it already installed:
+Furthermore, `typegraphql-prisma` requires Prisma 2 to work properly, so please install Prisma dependencies if you don't have it already installed:
 
 ```sh
 npm i -D @prisma/cli
 npm i @prisma/client
 ```
 
-> `typegraphql-prisma` is designed to work with a selected version of `prisma` (or newer), so please make sure you use `@prisma/cli` and `@prisma/client` of version `~2.6.0`!
+> Be aware that `typegraphql-prisma` is designed to work with a selected versions of `prisma`.
+>
+> Please make sure you use `@prisma/cli` and `@prisma/client` of version matching `~2.15.0`.
+> Otherwise, the runtime check will report an error when you run the generator.
 
 You also need to install the GraphQL JSON scalar library (to support the Prisma `Json` scalar):
 
@@ -121,7 +124,7 @@ model User {
   name  String?
   posts Post[]
 }
-````
+```
 
 It will generate a `User` class in the output folder, with TypeGraphQL decorators, and an enum - you can import them and use normally as a type or an explicit type in your resolvers:
 
@@ -166,19 +169,116 @@ It will also generates a whole bunch of stuffs based on your `schema.prisma` fil
 
 CRUD resolvers supports this following methods with args that are 1:1 matching with the `PrismaClient` API:
 
-- findOne
 - create
 - update
 - delete
+- findUnique
+- findFirst
 - findMany
 - updateMany
 - deleteMany
 - upsert
+- aggregate
+- groupBy
 
-By default, the method names will be mapped to a GraphQL idiomatic ones (like `findManyUser` -> `users`).
-You can opt-in to use original names by providing `useOriginalMapping = true` generator option.
+> By default, the method names will be mapped to a GraphQL idiomatic ones (like `findManyUser` -> `users`).
+> You can opt-in to use original names by providing `useOriginalMapping = true` generator option.
 
-Also, if you want to have relations like `User -> posts` emitted in schema, you need to import the relations resolvers and register them in your `buildSchema` call:
+The fastest way to expose all Prisma CRUD actions is to import `resolvers` from the output folder:
+
+```ts
+import { resolvers } from "@generated/type-graphql";
+
+const schema = await buildSchema({
+  resolvers,
+  validate: false,
+});
+```
+
+This will emit all CRUD actions and model relations in the schema.
+
+If you need more control, you can import the `crudResolvers` and `relationResolvers` arrays separately to even transform them:
+
+```ts
+import { crudResolvers, relationResolvers } from "@generated/type-graphql";
+```
+
+When using the generated resolvers, you have to first provide the `PrismaClient` instance into the context under `prisma` key, to make it available for the crud and relations resolvers:
+
+```ts
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+const server = new ApolloServer({
+  schema, // from previous step
+  playground: true,
+  context: (): Context => ({ prisma }),
+});
+```
+
+### Unchecked scalars input
+
+GraphQL does not support input unions, hence it's not possible to support both normal inputs and unchecked scalars input at the same time like the Prisma does.
+
+If you prefer simplicity over more sophisticated solutions like `connectOrCreate`, you can to provide the `useUncheckedScalarInputs` generator option:
+
+```prisma
+generator typegraphql {
+  provider                 = "typegraphql-prisma"
+  output                   = "../prisma/generated/type-graphql"
+  useUncheckedScalarInputs = true
+}
+```
+
+This way there will be generate input classes with relation id fields, instead of the normal "nested" inputs for creating/updating relations, e.g.:
+
+```ts
+@TypeGraphQL.InputType({
+  isAbstract: true,
+})
+export class PostUncheckedCreateInput {
+  @TypeGraphQL.Field(_type => String, {
+    nullable: false,
+  })
+  title!: string;
+
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: false,
+  })
+  authorId!: number;
+
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true,
+  })
+  editorId?: number | undefined;
+}
+```
+
+### Nest JS
+
+In order to use generated types and resolvers classes in NestJS, you need to use the [official `typegraphql-nestjs` package](https://github.com/MichalLytek/typegraphql-nestjs). This module allows for basic integration of TypeGraphQL with NestJS. You can find an example in the [`examples/4-nest-js` folder](https://github.com/MichalLytek/typegraphql-prisma/tree/main/examples/4-nest-js).
+
+Due to difference between TypeGraphQL and NestJS decorators, `typegraphql-prisma` doesn't work anymore with `@nestjs/graphql` from version 7.0.
+
+### Advanced usage
+
+#### Exposing selected models Prisma CRUD actions
+
+If you want to expose only CRUD Prisma actions for selected models, you can import crud resolver classes only for that models, instead of the all-in-one `resolvers` object.
+
+Then you just have to put them into the `buildSchema`:
+
+```ts
+import { UserCrudResolver, PostCrudResolver } from "@generated/type-graphql";
+
+const schema = await buildSchema({
+  resolvers: [CustomUserResolver, UserCrudResolver, PostCrudResolver],
+  validate: false,
+});
+```
+
+However, if you also want to have relations like `User -> posts` emitted in schema, you need to import also the relations resolvers and register them in your `buildSchema` call:
 
 ```ts
 import {
@@ -193,26 +293,29 @@ const schema = await buildSchema({
 });
 ```
 
-When using the generated resolvers, you have to first provide the `PrismaClient` instance into the context under `prisma` key, to make it available for the crud and relations resolvers:
+#### Exposing selected Prisma actions only
+
+If you want to expose only certain Prisma actions, like `findManyUser` or `createOneUser`, you can import resolver classes only for them, instead of the whole model `XYZCrudResolver`.
+Then you just have to put them into the `buildSchema`:
 
 ```ts
-import { PrismaClient } from "@prisma/client";
+import {
+  User,
+  FindManyUserResolver,
+  CreateUserResolver,
+  UserRelationsResolver,
+} from "@generated/type-graphql";
 
-const prisma = new PrismaClient();
-const server = new ApolloServer({
-  schema,
-  playground: true,
-  context: (): Context => ({ prisma }),
+const schema = await buildSchema({
+  resolvers: [
+    CustomUserResolver,
+    FindManyUserResolver,
+    CreateUserResolver,
+    UserRelationsResolver,
+  ],
+  validate: false,
 });
 ```
-
-### Nest JS
-
-In order to use generated types and resolvers classes in NestJS, you need to use the [official `typegraphql-nestjs` package](https://github.com/MichalLytek/typegraphql-nestjs). This module allows for basic integration of TypeGraphQL with NestJS. You can find an example in the [`examples/3-nest-js` folder](https://github.com/MichalLytek/type-graphql/tree/prisma/examples/3-nest-js).
-
-Due to difference between TypeGraphQL and NestJS decorators, `typegraphql-prisma` doesn't work anymore with `@nestjs/graphql` from version 7.0.
-
-### Advanced usage
 
 #### Custom operations
 
@@ -223,11 +326,133 @@ You can also add custom queries and mutations to the schema as always, using the
 export class CustomUserResolver {
   @Query(returns => User, { nullable: true })
   async bestUser(@Ctx() { prisma }: Context): Promise<User | null> {
-    return await prisma.user.findOne({
+    return await prisma.user.findUnique({
       where: { email: "bob@prisma.io" },
     });
   }
 }
+```
+
+#### Additional decorators for Prisma schema resolvers
+
+When you need to apply some decorators like `@Authorized`, `@UseMiddleware` or `@Extensions` on the generated resolvers methods, you don't need to modify the generated source files.
+
+To support this, `typegraphql-prisma` generates two things: `applyResolversEnhanceMap` function and a `ResolversEnhanceMap` type. All you need to do is to create a config object, where you put the decorator functions (without `@`) in an array, and then call that function with that config, eg.:
+
+```ts
+import {
+  ResolversEnhanceMap,
+  applyResolversEnhanceMap,
+} from "@generated/type-graphql";
+import { Authorized } from "type-graphql";
+
+const resolversEnhanceMap: ResolversEnhanceMap = {
+  Category: {
+    createCategory: [Authorized(Role.ADMIN)],
+  },
+};
+
+applyResolversEnhanceMap(resolversEnhanceMap);
+```
+
+This way, when you call `createCategory` GraphQL mutation, it will trigger the `type-graphql` `authChecker` function, providing a `Role.ADMIN` role, just like you would put the `@Authorized` on top of the resolver method.
+
+Also, if you have a large schema and you need to provide plenty of decorators, you can split the config definition into multiple smaller objects placed in different files.
+To accomplish this, just import the generic `ResolverActionsConfig` type and define the resolvers config separately for every Prisma schema model, e.g:
+
+```ts
+import {
+  ResolversEnhanceMap,
+  ResolverActionsConfig,
+  applyResolversEnhanceMap,
+} from "@generated/type-graphql";
+import { Authorized, Extensions } from "type-graphql";
+
+// define the decorators config using generic ResolverActionsConfig<TModelName> type
+const categoryActionsConfig: ResolverActionsConfig<"Category"> = {
+  deleteCategory: [
+    Authorized(Role.ADMIN),
+    Extensions({ logMessage: "Danger zone", logLevel: LogLevel.WARN }),
+  ],
+};
+const problemActionsConfig: ResolverActionsConfig<"Problem"> = {
+  createProblem: [Authorized()],
+};
+
+// join the actions config into a single resolvers enhance object
+const resolversEnhanceMap: ResolversEnhanceMap = {
+  Category: categoryActionsConfig,
+  Problem: problemActionsConfig,
+};
+
+// apply the config (it will apply decorators on the resolver class methods)
+applyResolversEnhanceMap(resolversEnhanceMap);
+```
+
+#### Additional decorators for Prisma schema classes and fields
+
+If you need to apply some decorators, like `@Authorized` or `@Extensions`, on the model `@ObjectType` and its fields, you can use similar pattern as for the resolver actions described above.
+
+All you need to do is to import `ModelsEnhanceMap` type and `applyModelsEnhanceMap` function, and then create a config object, where you put the decorator functions (without `@`) in an array.
+If you want to split the config definitions, you can use `ModelConfig` and `ModelFieldsConfig` type in the same way like `ResolverActionsConfig`, e.g.:
+
+```ts
+import {
+  ResolversEnhanceMap,
+  ResolverActionsConfig,
+  applyResolversEnhanceMap,
+} from "@generated/type-graphql";
+import { Authorized, Extensions } from "type-graphql";
+
+// define the decorators configs
+const userEnhanceConfig: ModelConfig<"User"> = {
+  fields: {
+    email: [
+      Authorized(Role.ADMIN),
+      Extensions({ logMessage: "Danger zone", logLevel: LogLevel.WARN }),
+    ],
+  },
+};
+const modelsEnhanceMap: ModelsEnhanceMap = {
+  User: userEnhanceConfig,
+  // or apply it inline
+  Recipe: {
+    class: [
+      // decorators for @ObjectType model class
+      Extensions({ logMessage: "Secret recipe", logLevel: LogLevel.INFO }),
+    ],
+    fields: {
+      // decorator for model class fields
+      averageRating: [Authorized()],
+    },
+  },
+};
+
+// apply the config (it will apply decorators on the model class and its properties)
+applyModelsEnhanceMap(modelsEnhanceMap);
+```
+
+This way, you can apply some rules on single model or its fields, like `User.email` visible only for Admin.
+
+In case of other output types like `AggregateFooBar`, you can use the same pattern but this time using the `applyOutputTypeEnhanceMap` function and `OutputTypeConfig` or `OutputTypesEnhanceMap` types:
+
+```ts
+const aggregateClientConfig: OutputTypeConfig<"AggregateClient"> = {
+  fields: {
+    avg: [Extensions({ complexity: 10 })],
+  },
+};
+
+applyOutputTypeEnhanceMap({
+  // separate config
+  AggregateClient: aggregateClientConfig,
+  // or an inline one
+  ClientAvgAggregate: {
+    fields: {
+      age: [Authorized()],
+    },
+  },
+});
 ```
 
 #### Adding fields to model type
@@ -243,36 +468,12 @@ export class CustomUserResolver {
     @Ctx() { prisma }: Context,
   ): Promise<Post | undefined> {
     const [favoritePost] = await prisma.user
-      .findOne({ where: { id: user.id } })
+      .findUnique({ where: { id: user.id } })
       .posts({ first: 1 });
 
     return favoritePost;
   }
 }
-```
-
-#### Exposing selected Prisma actions
-
-If you want to expose only certain Prisma actions, like `findManyUser` or `createOneUser`, you can import resolver classes only for them, instead of the whole model `CrudResolver`.
-Then you just have to put them into the `buildSchema`:
-
-```ts
-import {
-  User,
-  UserRelationsResolver,
-  FindManyUserResolver,
-  CreateUserResolver,
-} from "@generated/type-graphql";
-
-const schema = await buildSchema({
-  resolvers: [
-    CustomUserResolver,
-    UserRelationsResolver,
-    FindManyUserResolver,
-    CreateUserResolver,
-  ],
-  validate: false,
-});
 ```
 
 #### Changing exposed model type name
@@ -281,7 +482,7 @@ You can also change the name of the model types exposed in GraphQL Schema.
 To achieve this, just put the `@@TypeGraphQL.type` doc line above the model definition in `schema.prisma` file, e.g:
 
 ```prisma
-/// @@TypeGraphQL.type("Client")
+/// @@TypeGraphQL.type(name: "Client")
 model User {
   id     Int     @default(autoincrement()) @id
   email  String  @unique
@@ -305,7 +506,7 @@ To achieve this, just put the `@TypeGraphQL.field` doc line above the model fiel
 ```prisma
 model User {
   id     Int     @default(autoincrement()) @id
-  /// @TypeGraphQL.field("emailAddress")
+  /// @TypeGraphQL.field(name: "emailAddress")
   email  String  @unique
   posts  Post[]
 }
@@ -334,11 +535,87 @@ input UserCreateInput {
 
 The emitted input type classes automatically map the provided renamed field values from GraphQL query into proper Prisma input properties out of the box.
 
+#### Hiding Prisma model field in GraphQL schema
+
+Sometimes you may want to not expose some fields in GraphQL schema.
+To achieve this, just put the `@TypeGraphQL.omit` doc line above the model field definition in `schema.prisma` file, e.g:
+
+```prisma
+model User {
+  id        Int     @default(autoincrement()) @id
+  email     String  @unique
+  /// @TypeGraphQL.omit(output: true)
+  password  String
+  posts     Post[]
+}
+```
+
+Thanks to that, the field won't show up in the GraphQL schema representation:
+
+```graphql
+type User {
+  id: Int!
+  email: String!
+  posts: [Post!]!
+}
+```
+
+However, the prisma model field will be still visible in all input types, like `UserWhereInput` or `UserCreateInput`:
+
+```graphql
+input UserCreateInput {
+  email: String!
+  password: String!
+  posts: PostCreateManyWithoutAuthorInput!
+}
+```
+
+This behavior is temporary and will be improved soon by introducing `input: true` option to `@TypeGraphQL.omit`.
+
+#### Simple resolvers (performance)
+
+If you don't have any global middlewares and you want to tune the generated schema performance, you can turn on the `simpleResolvers` generator option:
+
+```prisma
+generator typegraphql {
+  provider        = "typegraphql-prisma"
+  simpleResolvers = true
+}
+```
+
+It will generate then all the output type and model type classes with `simpleResolvers: true` option of `ObjectType` decorator, [which can improve performance of underlying field resolvers](https://typegraphql.com/docs/performance.html#further-performance-tweaks), e.g.:
+
+```ts
+@TypeGraphQL.ObjectType({
+  isAbstract: true,
+  description: undefined,
+  simpleResolvers: true,
+})
+export class BatchPayload {
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: false,
+    description: undefined,
+  })
+  count!: number;
+}
+```
+
+#### Lifting Prisma version restriction
+
+By default, `typegraphql-prisma` generator checks is the installed Prisma version matches the one required one using semver rules.
+So when you try to use other version, like just released minor or the `dev` one, you will receive an error about wrong package version.
+
+If you want or need to try other version and you are sure what you're doing, you can use `SKIP_PRISMA_VERSION_CHECK` env variable to suppress that error:
+
+```sh
+SKIP_PRISMA_VERSION_CHECK=true npx prisma generate
+```
+
 ## Examples
 
 You can check out some integration examples on this repo:
 
-https://github.com/EndyKaufman/typegraphql-prisma-nestjs-example
+https://github.com/EndyKaufman/typegraphql-prisma/blob/main/examples/Readme.md
 
 ## Feedback
 

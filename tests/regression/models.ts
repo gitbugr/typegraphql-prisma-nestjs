@@ -150,12 +150,12 @@ describe("models", () => {
         url      = env("DATABASE_URL")
       }
 
-      /// @@TypeGraphQL.type("Client")
+      /// @@TypeGraphQL.type(name: "Client")
       model User {
         id     Int    @id @default(autoincrement())
         posts  Post[]
       }
-      /// @@TypeGraphQL.type("Article")
+      /// @@TypeGraphQL.type(name: "Article")
       model Post {
         id        Int   @id @default(autoincrement())
         author    User  @relation(fields: [authorId], references: [id])
@@ -182,11 +182,11 @@ describe("models", () => {
         id           Int       @id @default(autoincrement())
         dateOfBirth  DateTime
         /// renamed field docs
-        /// @TypeGraphQL.field("firstName")
+        /// @TypeGraphQL.field(name: "firstName")
         name         String
-        /// @TypeGraphQL.field("accountBalance")
+        /// @TypeGraphQL.field(name: "accountBalance")
         balance      Float?
-        /// @TypeGraphQL.field("userPosts")
+        /// @TypeGraphQL.field(name: "userPosts")
         posts        Post[]
       }
       model Post {
@@ -197,6 +197,51 @@ describe("models", () => {
     `;
 
     await generateCodeFromSchema(schema, { outputDirPath });
+    const userModelTSFile = await readGeneratedFile("/models/User.ts");
+
+    expect(userModelTSFile).toMatchSnapshot("User");
+  });
+
+  it("should properly generate object type class for prisma model with omitted field", async () => {
+    const schema = /* prisma */ `
+      datasource db {
+        provider = "postgresql"
+        url      = env("DATABASE_URL")
+      }
+
+      model User {
+        id           Int       @id @default(autoincrement())
+        dateOfBirth  DateTime
+        name         String
+        /// @TypeGraphQL.omit(output: true)
+        balance      Float?
+      }
+    `;
+
+    await generateCodeFromSchema(schema, { outputDirPath });
+    const userModelTSFile = await readGeneratedFile("/models/User.ts");
+
+    expect(userModelTSFile).toMatchSnapshot("User");
+  });
+
+  it("should properly generate object type class for prisma model when simpleResolvers option is enabled", async () => {
+    const schema = /* prisma */ `
+      datasource db {
+        provider = "postgresql"
+        url      = env("DATABASE_URL")
+      }
+
+      model User {
+        id           Int       @id @default(autoincrement())
+        dateOfBirth  DateTime
+        balance      Float?
+      }
+    `;
+
+    await generateCodeFromSchema(schema, {
+      outputDirPath,
+      simpleResolvers: true,
+    });
     const userModelTSFile = await readGeneratedFile("/models/User.ts");
 
     expect(userModelTSFile).toMatchSnapshot("User");
